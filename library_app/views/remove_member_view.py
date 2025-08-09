@@ -1,22 +1,21 @@
 from PyQt5.QtWidgets import QMainWindow, QMessageBox
-from ui.add_member import Ui_AddMember
+from library_app.ui.remove_member import Ui_RemoveMember
 
-class AddMemberView(QMainWindow):
+class RemoveMemberView(QMainWindow):
     def __init__(self, library):
         super().__init__()
-        self.ui = Ui_AddMember()
+        self.ui = Ui_RemoveMember()
         self.ui.setupUi(self)
         self.library = library
-        self.ui.btn_add_member.clicked.connect(self.add_member)
+        self.ui.btn_remove_member.clicked.connect(self.remove_member)
         
-    def add_member(self):
-        name = self.ui.line_name.text()
+    def remove_member(self):
         member_id = self.ui.line_member_id.text()
         
-        if not name or not member_id:
+        if not member_id:
             QMessageBox.warning(self, 'Error',  'please fill in all the fields')
             return
-        success, msg = self.library.add_member(name, member_id)
+        success, msg = self.library.remove_member(member_id)
         if success:
             QMessageBox.information(self, 'Done', msg)
         else:

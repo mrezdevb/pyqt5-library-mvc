@@ -1,23 +1,20 @@
 from PyQt5.QtWidgets import QMainWindow, QMessageBox
-from ui.add_book import Ui_AddBook
+from library_app.ui.loan_book import Ui_LoanBook
 
-class AddBookView(QMainWindow):
+class LoanBookView(QMainWindow):
     def __init__(self, library):
         super().__init__()
-        self.ui = Ui_AddBook()
+        self.ui = Ui_LoanBook()
         self.ui.setupUi(self)
         self.library = library
-        self.ui.btn_add_book.clicked.connect(self.add_book)
-        
-    def add_book(self):
-        title = self.ui.line_title.text()
-        author = self.ui.line_author.text()
+        self.ui.btn_loan_book.clicked.connect(self.loan_book)
+    def loan_book(self):
         isbn = self.ui.line_isbn.text()
-        
-        if not title or not author or not isbn:
+        member_id = self.ui.line_member_id.text()
+        if not isbn or not member_id:
             QMessageBox.warning(self, 'Error',  'please fill in all the fields')
             return
-        success, msg = self.library.add_book(title, author, isbn)
+        success, msg = self.library.loan_book(member_id, isbn)
         if success:
             QMessageBox.information(self, 'Done', msg)
         else:

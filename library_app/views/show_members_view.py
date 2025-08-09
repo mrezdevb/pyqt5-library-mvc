@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QMainWindow, QTableWidgetItem
-from ui.show_members import Ui_ShowMembers
+from library_app.ui.show_members import Ui_ShowMembers
 
 from PyQt5.QtCore import Qt
 
