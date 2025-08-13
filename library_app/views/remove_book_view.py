@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QMainWindow, QMessageBox
-from ui.remove_book import Ui_RemoveBook
+from library_app.ui.remove_book import Ui_RemoveBook
 
 
 class RemoveBookView(QMainWindow):

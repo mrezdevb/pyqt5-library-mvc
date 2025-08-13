@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QMainWindow, QTableWidgetItem
-from ui.show_books import Ui_ShowBooks
+from library_app.ui.show_books import Ui_ShowBooks
 
 from PyQt5.QtCore import Qt
 

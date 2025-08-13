@@ -1,5 +1,5 @@
 from PyQt5.QtWidgets import QMainWindow, QMessageBox
-from ui.return_book import Ui_ReturnBook
+from library_app.ui.return_book import Ui_ReturnBook
 
 class ReturnBookView(QMainWindow):
     def __init__(self, library):

@@ -1,22 +1,24 @@
 from PyQt5 import QtWidgets
-from ui.main import Ui_MainWindow
-from controllers.library import LibraryManagement
-from views.add_book_view import AddBookView
-from views.remove_book_view import RemoveBookView
-from views.add_member_view import AddMemberView
-from views.remove_member_view import RemoveMemberView
-from views.show_books_view import ShowBooksView
-from views.show_members_view import ShowMembersView
-from views.loan_book_view import LoanBookView
-from views.return_book_view import ReturnBookView
-
+from library_app.ui.main import Ui_MainWindow
+from library_app.controllers.library import LibraryManagement
+from library_app.views.add_book_view import AddBookView
+from library_app.views.remove_book_view import RemoveBookView
+from library_app.views.add_member_view import AddMemberView
+from library_app.views.remove_member_view import RemoveMemberView
+from library_app.views.show_books_view import ShowBooksView
+from library_app.views.show_members_view import ShowMembersView
+from library_app.views.loan_book_view import LoanBookView
+from library_app.views.return_book_view import ReturnBookView
+from library_app.db import SessionLocal
 
 class MainView(QtWidgets.QMainWindow):
 	def __init__(self):
 		super().__init__()
+		self.db_session = SessionLocal()
+		self.library = LibraryManagement(self.db_session)
 		self.ui = Ui_MainWindow()
 		self.ui.setupUi(self)
-		self.library = LibraryManagement()
+
 		self.ui.btn_add_book.clicked.connect(self.open_add_book)
 		self.ui.btn_remove_book.clicked.connect(self.open_remove_book)
 		self.ui.btn_add_member.clicked.connect(self.open_add_member)

@@ -1,73 +1,98 @@
-# Library Management System (v1.0)
+# 📚 Library Management System (v1.2.0)
 
-This is the first version of a modular Library Management System built with **Python** and **PyQt5**. It follows the MVC (Model-View-Controller) architecture and includes a graphical user interface.
+A modular, GUI-based library management system built with **Python**, **PyQt5**, **PostgreSQL**, and **SQLAlchemy**. This project implements the MVC (Model-View-Controller) pattern for clean architecture, modularity, and maintainability.
 
-## 📁 Project Structure
+---
 
-- `main.py` : Entry point of the application
-- `models/` : Data models (e.g. `Book`, `Member`)
-- `controllers/` : Business logic and core functionality
-- `views/` : Bridge between the UI and the controller
-- `ui/` : PyQt5-generated UI forms
-- `utils/` : Utility modules (e.g. logging)
+## 🧩 Features
 
-## ✨ Features
+- Add, remove, loan, and return books
+- Add and remove members
+- View books and members list
+- GUI built using PyQt5 (.ui converted to `.py`)
+- Database connectivity via PostgreSQL and SQLAlchemy ORM
+- Modular architecture: models, views, controllers, and utilities
+- Testable structure with `pytest`
+- Automatic `.env` creation script for easier setup
 
-- Add, and remove books in the library.
-- Add and remove library members.
-- Issue (lend) books to members.
-- Return books .
-- Display lists of all books and members.
-- Simple and intuitive graphical user interface built with PyQt5.
-- Modular architecture for easy maintenance and future extension.
+---
 
-## 📦 Installation
+## 🗂️ Project Structure
+
+```
+library_app/
+├── controllers/
+├── models/
+├── views/
+├── ui/
+├── utils/
+├── test/
+├── db.py
+├── init_db.py
+├── main.py
+├── install.py
+├── setup_env.py   # Script to automatically create `.env` file
+├── images/
+│   └── main_window.png
+├── __init__.py
+setup.py
+requirements.txt
+README.md
+```
+
+---
+
+## 🚀 Installation
+
+Make sure you have **Python 3.8+** and **PostgreSQL** installed and configured on your system.
 
 1. Clone the repository:
 
-    git clone https://github.com/mrezdevb/pyqt5-library-mvc.git
+```bash
+git clone https://github.com/mrezdevb/pyqt5-library-mvc.git
+```
 
-2. Install dependencies:
+2. Install the package along with dependencies:
 
-    pip install -r requirements.txt
+```bash
+pip install .
+```
 
-## 🎮 Usage
+> ℹ️ All dependencies defined in `requirements.txt` will be automatically installed through `setup.py`.
 
-Run the application with:
+3. Run the application:
 
-    python3 main.py
+```bash
+library-app
+```
 
-Use the GUI to manage books, members, and borrowing operations.
+---
 
-## 🤝 Contributing
+## 🧪 Running Tests
 
-Contributions are welcome! Please open an issue or submit a pull request for any improvements or bug fixes.
+The project uses `pytest` for unit testing. To run all tests:
 
-## 📄 License
+```bash
+pytest library_app/test
+```
 
-This project is licensed under the MIT License. See the LICENSE file for details.
-
-## 📸 Screenshots
-
-![main_window](images/main_window.png)
-
-## ⚠️ Known Issues / Limitations
-
-- Currently no persistent database; data is lost on application close.
-- No user authentication or role management yet.
-- Limited search and filter capabilities.
+---
 
 ## 🔮 Roadmap / Future Plans
 
-- Integrate persistent database (e.g., SQLite).
-- Add user authentication and role-based access.
 - Improve search and filtering options.
 - Enhance UI/UX with better design and responsiveness.
+- Add role-based authentication.
 
+---
+## 📃 License
+
+MIT License
+
+---
 
 ## 📞 Contact / Author
 
 Mohammadreza Mahdian  
 Email: mrez.devb@gmail.com  
 GitHub: https://github.com/mrezdevb
-

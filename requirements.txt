@@ -1,3 +1,9 @@
+greenlet==3.2.3
+psycopg2-binary==2.9.10
 PyQt5==5.15.11
+PyQt5-Qt5==5.15.17
 PyQt5_sip==12.17.0
-
+python-dotenv==1.1.1
+setuptools==80.9.0
+SQLAlchemy==2.0.42
+typing_extensions==4.14.1
