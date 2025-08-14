@@ -11,22 +11,22 @@ class PostInstallCommand(install):
 		create_env()
 
 
-
-
 with open('requirements.txt') as f:
 	requirements = f.read().splitlines()
 
 
 setup(
 	name='library_manager',
-	version='1.2.0',
+	version='1.4.0',
 	packages=find_packages(),
 	install_requires=requirements,
 	include_package_data=True,
 	entry_points={
 		'console_scripts' : [
-			'setup-env=library_app.setup_env:create_env',
-			'library-app=library_app.main:main',
+                        'setup-env=library_app.setup_env:create_env',
+			'library-run = library_app.main:main',
+			'library-install = library_app.install:main',
+			'library-uninstall=library_app.uninstall:drop_database',
 		],
 	},
 	cmdclass={

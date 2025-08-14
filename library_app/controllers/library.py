@@ -139,3 +139,16 @@ class LibraryManagement:
 		logger.info(msg)
 		return True, msg
 
+	def search_books(self, keyword: str):
+		results = self.db.query(Book).filter(Book.title.ilike(f'%{keyword}%') | Book.author.ilike(f'%{keyword}%') | Book.isbn.ilike(f'%{keyword}%')).all()
+		if not results:
+			logger.info(f'No books found matching "{keyword}".')
+			return []
+		return results
+
+	def search_members(self, keyword: str):
+			results = self.db.query(Member).filter(Member.name.ilike(f'%{keyword}%') | Member.member_id.ilike(f'%{keyword}%')).all()
+			if not results:
+					logger.info(f'No members found matching "{keyword}".')
+					return []
+			return results
