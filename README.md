@@ -1,95 +1,35 @@
-# 📚 Library Management System (v1.4.0)
+# 📚 Library Management System (v1.5.0)
 
-A modular, GUI-based library management system built with **Python**, **PyQt5**, **PostgreSQL**, and **SQLAlchemy**.  
-Implements the MVC (Model-View-Controller) pattern for clean architecture, modularity, and maintainability.
-
----
-
-## 🆕 What's New in v1.4.0
-
-- **Search feature** for finding books by **title**, **author**, or **ISBN**.
-- **Database removal** command (`library-uninstall`).
-- **Database creation** command (`library-install`) integrated with the installation process.
-- Improved installation and execution flow using `console_scripts` commands.
-- Various bug fixes and stability improvements.
+A modular, GUI-based library management system built with **Python**, **PyQt5**, **PostgreSQL**, and **SQLAlchemy**, following the **MVC** pattern for clean architecture and maintainability.
 
 ---
 
-## 🧩 Features
+## 🆕 What's New in v1.5.0
+
+- **Added limit on the number of books each member can borrow.**  
+- **Maximum borrow limit configurable via `MAX_BORROW_LIMIT` in `.env`.**  
+
+---
+
+## 🧩 Main Features
 
 - Add, remove, loan, and return books
 - Add and remove members
-- **Search books by title/author/ISBN**
+- Search books by title, author, or ISBN
 - View books and members list
-- GUI built using PyQt5 (.ui converted to `.py`)
-- Database connectivity via PostgreSQL and SQLAlchemy ORM
-- Modular architecture: models, views, controllers, and utilities
-- Testable structure with `pytest`
+- GUI built with PyQt5
+- Database via PostgreSQL & SQLAlchemy ORM
+- Modular architecture (models, views, controllers)
+- Fully testable with `pytest`
 
 ---
 
-## 🗂️ Project Structure
+## ⚙️ Configuration
+
+Set maximum borrow limit in `.env`:
 
 ```
-├── library_app
-│   ├── controllers
-│   │   ├── __init__.py
-│   │   └── library.py
-│   ├── db.py
-│   ├── images
-│   │   └── main_window.png
-│   ├── init_db.py
-│   ├── __init__.py
-│   ├── install.py
-│   ├── main.py
-│   ├── models
-│   │   ├── base.py
-│   │   ├── book.py
-│   │   ├── __init__.py
-│   │   ├── loan.py
-│   │   └── member.py
-│   ├── test
-│   │   ├── __init__.py
-│   │   ├── test_controllers
-│   │   │   ├── __init__.py
-│   │   │   └── test_library_management.py
-│   │   ├── test_models
-│   │   │   ├── __init__.py
-│   │   │   ├── test_book.py
-│   │   │   ├── test_loan.py
-│   │   │   └── test_member.py
-│   │   └── test_utils
-│   │       ├── __init__.py
-│   │       └── test_logger.py
-│   ├── ui
-│   │   ├── add_book.py
-│   │   ├── add_member.py
-│   │   ├── __init__.py
-│   │   ├── loan_book.py
-│   │   ├── main.py
-│   │   ├── remove_book.py
-│   │   ├── remove_member.py
-│   │   ├── return_book.py
-│   │   ├── show_books.py
-│   │   └── show_members.py
-│   ├── uninstall.py
-│   ├── utils
-│   │   ├── __init__.py
-│   │   └── logger.py
-│   └── views
-│       ├── add_book_view.py
-│       ├── add_member_view.py
-│       ├── __init__.py
-│       ├── loan_book_view.py
-│       ├── main_window.py
-│       ├── remove_book_view.py
-│       ├── remove_member_view.py
-│       ├── return_book_view.py
-│       ├── show_books_view.py
-│       └── show_members_view.py
-├── README.md
-├── requirements.txt
-└── setup.py
+MAX_BORROW_LIMIT=3
 ```
 
 ---
@@ -131,32 +71,3 @@ pip uninstall library_manager
 ```
 
 ---
-
-## 🧪 Running Tests
-
-```bash
-pytest library_app/test
-```
-
----
-
-## 🔮 Roadmap / Future Plans
-
-- Add advanced filtering.
-- Limit the number of books each member can borrow.
-- Display the list of books borrowed by each member.
-- Show book availability status in the books table.
-
----
-
-## 📃 License
-
-MIT License
-
----
-
-## 📞 Contact
-
-Mohammadreza Mahdian  
-Email: mrez.devb@gmail.com  
-GitHub: https://github.com/mrezdevb  

@@ -3,7 +3,9 @@ from library_app.models.member import Member
 from library_app.models.loan import Loan
 from library_app.utils.logger import get_logger
 from datetime import datetime, timezone
-
+from dotenv import load_dotenv
+import os
+load_dotenv()
 
 logger = get_logger("LibraryManagement")
 
@@ -89,10 +91,10 @@ class LibraryManagement:
 
 
 	def loan_book(self, member_id: str, isbn: str):
-
+		max_borrow_limit = os.getenv('MAX_BORROW_LIMIT')
 		book = self.db.query(Book).filter(Book.isbn == isbn).first()
 		member = self.db.query(Member).filter(Member.member_id == member_id).first()
-		
+		active_loans_book = (self.db.query(Loan).filter(Loan.member_id == member_id, Loan.returned == False).count())
 		if not member:
 			msg = f'Member ID {member_id} not found'
 			logger.error(msg)
@@ -103,6 +105,10 @@ class LibraryManagement:
 			return False, msg
 		if book.is_borrowed:
 			msg = f'Book with ISBN {isbn} is already borrowed.'
+			logger.warning(msg)
+			return False, msg
+		if int(active_loans_book) >= int(max_borrow_limit):
+			msg = f'This member already has {max_borrow_limit} borrowed books.'
 			logger.warning(msg)
 			return False, msg
 		new_loan = Loan(member_id = str(member.member_id), isbn = str(book.isbn), loan_date=datetime.now(timezone.utc))

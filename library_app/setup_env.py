@@ -4,6 +4,7 @@ env_content = """ DB_NAME=library_db
 DB_USER=postgres
 DB_PASSWORD=secret123
 DB_HOST=localhost
+MAX_BORROW_LIMIT=3
 """
 
 def create_env():

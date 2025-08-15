@@ -35,9 +35,6 @@ class ShowBooksView(QMainWindow):
 
     def search_books(self):
         keyword = self.ui.search_input.text().strip()
-        if not keyword:
-            QMessageBox.warning(self, 'Warning', 'Please enter a keyword for search')
-            return
 
         books = self.library.search_books(keyword)
         if not books:
