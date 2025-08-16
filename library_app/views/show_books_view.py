@@ -22,7 +22,8 @@ class ShowBooksView(QMainWindow):
         self.load_books()
         self.ui.search_btn.clicked.connect(self.search_books)
     def load_books(self):
-        books = self.library.show_books()
+        filter_option = self.ui.filter_combo.currentText()
+        books= self.library.show_books(filter_option)
         if books is None:
             books = []
 
@@ -35,12 +36,16 @@ class ShowBooksView(QMainWindow):
 
     def search_books(self):
         keyword = self.ui.search_input.text().strip()
+        filter_option = self.ui.filter_combo.currentText()
 
-        books = self.library.search_books(keyword)
-        if not books:
+        books, status = self.library.search_books(keyword, filter_option)
+        if status ==  'not found':
             QMessageBox.information(self, 'No Results', f'No books found for "{keyword}".')
             self.ui.table_books.setRowCount(0)
             return
+        if status == 'borrowed':
+            QMessageBox.information(self, 'Borrowed', f'Books matching "{keyword}" are currently borrowed.')
+            self.ui.table_books.setRowCount(0)
 
         self.ui.table_books.setRowCount(len(books))
         for row, book in enumerate(books):

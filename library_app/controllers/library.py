@@ -70,12 +70,17 @@ class LibraryManagement:
 			return False, msg
 
 
-	def show_books(self):
-		books = self.db.query(Book).all()
+	def show_books(self, filter_option: str):
+		books = ''
+		if filter_option == 'All Books':
+			books = self.db.query(Book).all()
+		else:
+			books = self.db.query(Book).filter(Book.is_borrowed == False).all()
 		if not books:
 			logger.info('No books available.')
 			return []
 		return books
+		
 	
 
 
@@ -145,12 +150,32 @@ class LibraryManagement:
 		logger.info(msg)
 		return True, msg
 
-	def search_books(self, keyword: str):
-		results = self.db.query(Book).filter(Book.title.ilike(f'%{keyword}%') | Book.author.ilike(f'%{keyword}%') | Book.isbn.ilike(f'%{keyword}%')).all()
-		if not results:
-			logger.info(f'No books found matching "{keyword}".')
-			return []
-		return results
+	def search_books(self, keyword: str, filter_option: str):
+		base_query = self.db.query(Book).filter(
+			Book.title.ilike(f'%{keyword}%') |
+			Book.author.ilike(f'%{keyword}%') |
+			Book.isbn.ilike(f'%{keyword}%')
+		)
+
+		all_results = base_query.all()
+		if not all_results:
+			msg = f'No books found matching "{keyword}".'
+			logger.info(msg)
+			return [], 'not found'
+
+		if filter_option != 'All Books':
+			available_books = [book for book in all_results if not book.is_borrowed]
+			if not available_books:
+				msg = f'Books matching "{keyword}" are borrowed.'
+				logger.info(msg)
+				return [], 'borrowed'
+			return available_books, 'ok'
+
+		return all_results, 'ok'
+
+
+
+		
 
 	def search_members(self, keyword: str):
 			results = self.db.query(Member).filter(Member.name.ilike(f'%{keyword}%') | Member.member_id.ilike(f'%{keyword}%')).all()

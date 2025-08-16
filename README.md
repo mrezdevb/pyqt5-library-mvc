@@ -1,73 +1,52 @@
-# 📚 Library Management System (v1.5.0)
+# 📦 Release v1.7.0
 
-A modular, GUI-based library management system built with **Python**, **PyQt5**, **PostgreSQL**, and **SQLAlchemy**, following the **MVC** pattern for clean architecture and maintainability.
+## 🚀 New Features
+- **Advanced Book Filtering in UI**  
+  - Added a filter option in the **Show Books** view allowing users to switch between:
+    - **All Books** – Displays all registered books.
+    - **Available Books** – Displays only books that are not currently borrowed.
+- **Smart Search Messages**  
+  - Search messages are now more informative and context-aware:
+    - If no book is found → *"No books found for `<keyword>`."*
+    - If books exist but are all borrowed → *"Books matching `<keyword>` are currently borrowed."*
+  - This helps users know when a book exists but is temporarily unavailable.
 
----
+## 🖥 UI Improvements
+- Updated **Show Books** view to integrate search and filtering seamlessly.
+- Optimized table rendering for faster updates when changing filters or performing searches.
+- Ensured table cells remain read-only to prevent accidental edits.
 
-## 🆕 What's New in v1.5.0
+## ⚙ Backend & Logic Enhancements
+- Refactored `show_books` and `search_books` functions to support filtering and status-based messages.
+- Optimized queries to reduce unnecessary executions and improve code maintainability.
+- Enhanced logging for search and filter operations to assist in debugging and monitoring.
 
-- **Added limit on the number of books each member can borrow.**  
-- **Maximum borrow limit configurable via `MAX_BORROW_LIMIT` in `.env`.**  
-
----
-
-## 🧩 Main Features
-
-- Add, remove, loan, and return books
-- Add and remove members
-- Search books by title, author, or ISBN
-- View books and members list
-- GUI built with PyQt5
-- Database via PostgreSQL & SQLAlchemy ORM
-- Modular architecture (models, views, controllers)
-- Fully testable with `pytest`
-
----
-
-## ⚙️ Configuration
-
-Set maximum borrow limit in `.env`:
-
-```
-MAX_BORROW_LIMIT=3
-```
-
----
-
-## 🚀 Installation & Commands
-
-Make sure you have **Python 3.8+** and **PostgreSQL** installed and configured.
-
-1. Clone the repository:
-
-```bash
-git clone https://github.com/mrezdevb/pyqt5-library-mvc.git
-```
-
-2. Install the package with dependencies.
-   **During installation, the system will automatically create a `.env` file** (no manual setup needed) and initialize the database:
-
+## 📋 Installation & Usage
+### Install the application:
 ```bash
 pip install .
+```
+
+### Create the database:
+```bash
 library-install
 ```
 
-3. Run the application:
-
+### Run the application:
 ```bash
 library-run
 ```
 
-4. Uninstall the database:
-
+### Remove the database:
 ```bash
 library-uninstall
 ```
 
-5. Uninstall the package:
-
+### Uninstall the application:
 ```bash
 pip uninstall library_manager
 ```
 
 ---
+**Tag:** `v1.7.0`  
+
