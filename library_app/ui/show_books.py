@@ -10,7 +10,7 @@ class Ui_ShowBooks(object):
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
 
-        # 📌 لایه اصلی
+        # بخش لی‌آوت اصلی
         self.verticalLayoutWidget = QtWidgets.QWidget(self.centralwidget)
         self.verticalLayoutWidget.setGeometry(QtCore.QRect(70, 40, 671, 400))
         self.verticalLayoutWidget.setObjectName("verticalLayoutWidget")
@@ -19,41 +19,47 @@ class Ui_ShowBooks(object):
         self.verticalLayout.setSpacing(10)
         self.verticalLayout.setObjectName("verticalLayout")
 
-        # 📌 بخش جستجو و فیلتر
+        # بخش جستجو
         self.search_layout = QtWidgets.QHBoxLayout()
         self.search_layout.setSpacing(10)
-        
+
         self.search_input = QtWidgets.QLineEdit(self.verticalLayoutWidget)
         self.search_input.setPlaceholderText("Search by title or author...")
         self.search_input.setFixedHeight(30)
-        
-        # 📌 فیلتر کتاب‌ها
+
         self.filter_combo = QtWidgets.QComboBox(self.verticalLayoutWidget)
         self.filter_combo.addItems(["All Books", "Available Books"])
         self.filter_combo.setFixedHeight(30)
-        
+
         self.search_btn = QtWidgets.QPushButton("Search", self.verticalLayoutWidget)
         self.search_btn.setFixedHeight(30)
 
-        # 📌 اضافه کردن به لایه جستجو
         self.search_layout.addWidget(self.search_input)
         self.search_layout.addWidget(self.filter_combo)
         self.search_layout.addWidget(self.search_btn)
         self.verticalLayout.addLayout(self.search_layout)
 
-        # 📌 جدول کتاب‌ها
+        # جدول نمایش کتاب‌ها
         self.table_books = QtWidgets.QTableWidget(self.verticalLayoutWidget)
         self.table_books.setObjectName("table_books")
-        self.table_books.setColumnCount(3)
+        self.table_books.setColumnCount(4)  # ستون چهارم اضافه شد
         self.table_books.setRowCount(1)
+
         item = QtWidgets.QTableWidgetItem()
         self.table_books.setVerticalHeaderItem(0, item)
+
         item = QtWidgets.QTableWidgetItem()
         self.table_books.setHorizontalHeaderItem(0, item)
+
         item = QtWidgets.QTableWidgetItem()
         self.table_books.setHorizontalHeaderItem(1, item)
+
         item = QtWidgets.QTableWidgetItem()
         self.table_books.setHorizontalHeaderItem(2, item)
+
+        item = QtWidgets.QTableWidgetItem()  # ستون وضعیت کتاب
+        self.table_books.setHorizontalHeaderItem(3, item)
+
         self.table_books.horizontalHeader().setDefaultSectionSize(130)
         self.table_books.horizontalHeader().setHighlightSections(True)
         self.table_books.horizontalHeader().setMinimumSectionSize(23)
@@ -62,7 +68,7 @@ class Ui_ShowBooks(object):
         self.table_books.verticalHeader().setVisible(True)
         self.verticalLayout.addWidget(self.table_books)
 
-        # 📌 فضای پایینی (رزرو برای آینده)
+        # بخش پایینی (فعلاً خالی)
         self.verticalLayoutWidget_4 = QtWidgets.QWidget(self.centralwidget)
         self.verticalLayoutWidget_4.setGeometry(QtCore.QRect(0, 490, 101, 61))
         self.verticalLayoutWidget_4.setObjectName("verticalLayoutWidget_4")
@@ -93,6 +99,8 @@ class Ui_ShowBooks(object):
         item.setText(_translate("MainWindow", "Author"))
         item = self.table_books.horizontalHeaderItem(2)
         item.setText(_translate("MainWindow", "ISBN"))
+        item = self.table_books.horizontalHeaderItem(3)
+        item.setText(_translate("MainWindow", "Status"))  # ستون جدید
 
 if __name__ == "__main__":
     import sys

@@ -10,7 +10,7 @@ class Ui_ShowMembers(object):
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
 
-        
+        # بخش لی‌آوت اصلی
         self.verticalLayoutWidget = QtWidgets.QWidget(self.centralwidget)
         self.verticalLayoutWidget.setGeometry(QtCore.QRect(70, 40, 671, 400))
         self.verticalLayoutWidget.setObjectName("verticalLayoutWidget")
@@ -19,7 +19,7 @@ class Ui_ShowMembers(object):
         self.verticalLayout.setSpacing(10)
         self.verticalLayout.setObjectName("verticalLayout")
 
-      
+        # بخش جستجو
         self.search_layout = QtWidgets.QHBoxLayout()
         self.search_layout.setSpacing(10)
         self.search_input = QtWidgets.QLineEdit(self.verticalLayoutWidget)
@@ -31,10 +31,10 @@ class Ui_ShowMembers(object):
         self.search_layout.addWidget(self.search_btn)
         self.verticalLayout.addLayout(self.search_layout)
 
-       
+        # جدول اعضا
         self.table_members = QtWidgets.QTableWidget(self.verticalLayoutWidget)
         self.table_members.setObjectName("table_members")
-        self.table_members.setColumnCount(2)
+        self.table_members.setColumnCount(3)  # ستون‌ها را 3 کردیم
         self.table_members.setRowCount(1)
         item = QtWidgets.QTableWidgetItem()
         self.table_members.setVerticalHeaderItem(0, item)
@@ -42,6 +42,8 @@ class Ui_ShowMembers(object):
         self.table_members.setHorizontalHeaderItem(0, item)
         item = QtWidgets.QTableWidgetItem()
         self.table_members.setHorizontalHeaderItem(1, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.table_members.setHorizontalHeaderItem(2, item)  # ستون جدید
         self.table_members.horizontalHeader().setDefaultSectionSize(190)
         self.table_members.horizontalHeader().setHighlightSections(True)
         self.table_members.horizontalHeader().setMinimumSectionSize(23)
@@ -50,7 +52,7 @@ class Ui_ShowMembers(object):
         self.table_members.verticalHeader().setVisible(True)
         self.verticalLayout.addWidget(self.table_members)
 
-        
+        # پایین صفحه
         self.verticalLayoutWidget_4 = QtWidgets.QWidget(self.centralwidget)
         self.verticalLayoutWidget_4.setGeometry(QtCore.QRect(0, 490, 101, 61))
         self.verticalLayoutWidget_4.setObjectName("verticalLayoutWidget_4")
@@ -79,6 +81,8 @@ class Ui_ShowMembers(object):
         item.setText(_translate("MainWindow", "Name"))
         item = self.table_members.horizontalHeaderItem(1)
         item.setText(_translate("MainWindow", "Member ID"))
+        item = self.table_members.horizontalHeaderItem(2)
+        item.setText(_translate("MainWindow", "Borrowed Books"))  # ستون جدید
 
 if __name__ == "__main__":
     import sys

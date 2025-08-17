@@ -33,7 +33,8 @@ class ShowBooksView(QMainWindow):
             self.ui.table_books.setItem(row, 0, create_readonly_item(book.title))
             self.ui.table_books.setItem(row, 1, create_readonly_item(book.author))
             self.ui.table_books.setItem(row, 2, create_readonly_item(book.isbn))
-
+            status_text = 'Borrowed' if book.is_borrowed == True else 'Available'
+            self.ui.table_books.setItem(row, 3, create_readonly_item(status_text))
     def search_books(self):
         keyword = self.ui.search_input.text().strip()
         filter_option = self.ui.filter_combo.currentText()
@@ -52,3 +53,5 @@ class ShowBooksView(QMainWindow):
             self.ui.table_books.setItem(row, 0, create_readonly_item(book.title))
             self.ui.table_books.setItem(row, 1, create_readonly_item(book.author))
             self.ui.table_books.setItem(row, 2, create_readonly_item(book.isbn))
+            status_text = 'Borrowed' if book.is_borrowed == True else 'Available'
+            self.ui.table_books.setItem(row, 3, create_readonly_item(status_text))

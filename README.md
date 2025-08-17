@@ -1,27 +1,20 @@
-# 📦 Release v1.7.0
+# 📦 Release v1.9.0
 
 ## 🚀 New Features
-- **Advanced Book Filtering in UI**  
-  - Added a filter option in the **Show Books** view allowing users to switch between:
-    - **All Books** – Displays all registered books.
-    - **Available Books** – Displays only books that are not currently borrowed.
-- **Smart Search Messages**  
-  - Search messages are now more informative and context-aware:
-    - If no book is found → *"No books found for `<keyword>`."*
-    - If books exist but are all borrowed → *"Books matching `<keyword>` are currently borrowed."*
-  - This helps users know when a book exists but is temporarily unavailable.
+- **Book Status Column in Show Books**  
+  - Added a new **Status** column in the *Show Books* table to indicate whether each book is currently borrowed or available.
+- **Borrowed Books Column in Show Members**  
+  - Added a **Borrowed Books** column in the *Show Members* table to display the titles of books each member has currently borrowed.
 
 ## 🖥 UI Improvements
-- Updated **Show Books** view to integrate search and filtering seamlessly.
-- Optimized table rendering for faster updates when changing filters or performing searches.
-- Ensured table cells remain read-only to prevent accidental edits.
+- Updated **Show Books** and **Show Members** tables to include the new columns while keeping them read-only.
+- Improved table resizing and formatting for better readability.
 
 ## ⚙ Backend & Logic Enhancements
-- Refactored `show_books` and `search_books` functions to support filtering and status-based messages.
-- Optimized queries to reduce unnecessary executions and improve code maintainability.
-- Enhanced logging for search and filter operations to assist in debugging and monitoring.
+- Extended `show_books` logic to return book availability status.
+- Extended `show_members` logic to retrieve and display a list of borrowed books per member.
+- Optimized database queries with `joinedload` to reduce SQL calls.
 
-## 📋 Installation & Usage
 ### Install the application:
 ```bash
 pip install .
@@ -46,7 +39,5 @@ library-uninstall
 ```bash
 pip uninstall library_manager
 ```
-
 ---
-**Tag:** `v1.7.0`  
-
+**Tag:** `v1.9.0`
