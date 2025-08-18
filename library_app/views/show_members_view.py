@@ -1,7 +1,8 @@
 from PyQt5.QtWidgets import QMainWindow, QTableWidgetItem, QMessageBox
 from library_app.ui.show_members import Ui_ShowMembers
-
 from PyQt5.QtCore import Qt
+from library_app.controllers.library_controller import LibraryController
+
 
 def create_readonly_item(text):
     item = QTableWidgetItem(text)
@@ -12,46 +13,50 @@ def create_readonly_item(text):
 
 
 class ShowMembersView(QMainWindow):
-    def __init__(self, library, main_view=None):
+    def __init__(self, controller, main_view=None):
         super(ShowMembersView, self).__init__()
         self.ui = Ui_ShowMembers()
         self.ui.setupUi(self)
-        self.library = library
         self.main_view = main_view
+        self.controller = controller
+        self._setup_table_headers()
+        self.last_search_keyword = ''
         self.load_members()
+        controller.members_updated.connect(self.load_members)
         self.ui.search_btn.clicked.connect(self.search_members)
-    def load_members(self):
-        members = self.library.show_members()
-        if members is None:
-            members = []
+
+
+    def _setup_table_headers(self):
         self.ui.table_members.setColumnCount(3)
         self.ui.table_members.setHorizontalHeaderLabels(['Name', 'Member ID', 'Borrowed Books'])
-        self.ui.table_members.setRowCount(len(members))
 
+
+    def populate_table(self, members):
+        self.ui.table_members.setRowCount(len(members))
         for row, member in enumerate(members):
-            self.ui.table_members.setItem(row, 0, create_readonly_item(member['name']))
-            self.ui.table_members.setItem(row, 1, create_readonly_item(member['member_id']))
-            self.ui.table_members.setItem(row, 2, create_readonly_item(member['borrowed_books'] or '-'))
-    
-    
-    
+            self.ui.table_members.setItem(row, 0, create_readonly_item(member.get('name', '-')))
+            self.ui.table_members.setItem(row, 1, create_readonly_item(member.get('member_id', '-')))
+            self.ui.table_members.setItem(row, 2, create_readonly_item(member.get('borrowed_books') or '-'))
+
+
+    def load_members(self):
+        if self.last_search_keyword:
+            members = self.controller.search_members(self.last_search_keyword) or []
+            self.populate_table(members)
+        else:
+            members = self.controller.show_members() or []
+            self.populate_table(members)
+
+
     def search_members(self):
         keyword = self.ui.search_input.text().strip()
-        # if not keyword:
-        #     QMessageBox.warning(self, 'Warning', 'Please enter a keyword for search.')
-        #     return
-
-        members = self.library.search_members(keyword)
+        self.last_search_keyword = keyword if keyword else ''
+        if not keyword:
+            self.load_members()
+            return
+        members = self.controller.search_members(keyword) or []
         if not members:
             QMessageBox.information(self, 'No Result', f'No Members found for "{keyword}".')
             self.ui.table_members.setRowCount(0)
-            return 
-
-        self.ui.table_members.setColumnCount(3)
-        self.ui.table_members.setHorizontalHeaderLabels(['Name', 'Member ID', 'Borrowed Books'])
-        self.ui.table_members.setRowCount(len(members))
-
-        for row, member in enumerate(members):
-            self.ui.table_members.setItem(row, 0, create_readonly_item(member['name']))
-            self.ui.table_members.setItem(row, 1, create_readonly_item(member['member_id']))
-            self.ui.table_members.setItem(row, 2, create_readonly_item(member['borrowed_books'] or '-'))
+            return
+        self.populate_table(members)

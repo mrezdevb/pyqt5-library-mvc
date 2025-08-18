@@ -5,7 +5,7 @@ from library_app.models.base import Base
 from library_app.models.book import Book
 from library_app.models.member import Member
 from library_app.models.loan import Loan
-from library_app.controllers.library import LibraryManagement
+from library_app.controllers.library_controller import LibraryController
 DATABASE_URL = 'sqlite:///:memory:'
 @pytest.fixture
 def db_session():
@@ -17,7 +17,7 @@ def db_session():
 	session.close()
 @pytest.fixture
 def manager(db_session):
-	return LibraryManagement(db_session)
+	return LibraryController(db_session)
 def test_add_book_success(manager):
 	success, msg = manager.add_book('Test Book', 'Author', '12345')
 	assert success is True
@@ -97,14 +97,44 @@ def test_remove_member_not_found(manager):
 def test_show_books(manager):
 	manager.add_book('book1', 'a', 'b10')
 	manager.add_book('book2', 'b', 'b11')
-	books = manager.show_books()
+	books = manager.show_books(filter_option=None)
 	assert isinstance(books, list)
 	assert len(books) == 2
 	assert all(isinstance(book, Book) for book in books)
 def test_show_members(manager):
 	manager.add_member('John', 'm001')
 	manager.add_member('Snow', 'm002')
-	members = manager.show_members()
+	members = manager.show_members(raw=True)
 	assert isinstance(members, list)
 	assert len(members) == 2
 	assert all(isinstance(member, Member) for member in members)
+def test_search_books_found(manager):
+	manager.add_book('The Hobbit', 'J.R.R. Tolkien', 'bk001')
+	manager.add_book('The Lord of the Rings', 'J.R.R. Tolkien', 'bk002')
+	results, msg = manager.search_books(keyword='Hobbit', filter_option=None)
+	assert isinstance(results, list)
+	assert len(results) == 1
+	assert results[0].title == 'The Hobbit'
+
+def test_search_books_not_found(manager):
+	manager.add_book('The Hobbit', 'J.R.R. Tolkien', 'bk001')
+	results, msg = manager.search_books(keyword='Harry Potter', filter_option=None)
+	assert isinstance(results, list)
+	assert len(results)==0
+
+
+def test_search_members_found(manager):
+	manager.add_member('John Doe', 'mem01')
+	manager.add_member('Jane Smith', 'mem02')
+	results = manager.search_members(keyword='Jane', raw=True)
+	assert isinstance(results, list)
+	assert len(results) == 1
+	assert results[0].name == 'Jane Smith'
+
+
+def test_search_members_not_found(manager):
+	manager.add_member('Jane Smith', 'mem02')
+	results = manager.search_members(keyword='Snow')
+	assert isinstance(results, list)
+	assert len(results)==0
+

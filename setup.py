@@ -1,12 +1,13 @@
 from setuptools import setup, find_packages
 from setuptools.command.install import install
 import sys
-from library_app.setup_env import create_env
+
 
 class PostInstallCommand(install):
 	def run(self):
 		install.run(self)
 		print("\n📦 Running setup_env to create .env file...")
+		from library_app.setup_env import create_env
 		create_env()
 
 
@@ -16,13 +17,13 @@ with open('requirements.txt') as f:
 
 setup(
 	name='library_manager',
-	version='1.9.0',
+	version='2.0.0',
 	packages=find_packages(),
 	install_requires=requirements,
 	include_package_data=True,
 	entry_points={
 		'console_scripts' : [
-                        'setup-env=library_app.setup_env:create_env',
+            'setup-env=library_app.setup_env:create_env',
 			'library-run = library_app.main:main',
 			'library-install = library_app.install:main',
 			'library-uninstall=library_app.uninstall:drop_database',

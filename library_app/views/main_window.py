@@ -1,6 +1,6 @@
 from PyQt5 import QtWidgets
 from library_app.ui.main import Ui_MainWindow
-from library_app.controllers.library import LibraryManagement
+from library_app.controllers.library_controller import LibraryController
 from library_app.views.add_book_view import AddBookView
 from library_app.views.remove_book_view import RemoveBookView
 from library_app.views.add_member_view import AddMemberView
@@ -12,47 +12,35 @@ from library_app.views.return_book_view import ReturnBookView
 from library_app.db import SessionLocal
 
 class MainView(QtWidgets.QMainWindow):
-	def __init__(self):
+	def __init__(self, controller: LibraryController):
 		super().__init__()
-		self.db_session = SessionLocal()
-		self.library = LibraryManagement(self.db_session)
+		self.controller = controller
 		self.ui = Ui_MainWindow()
 		self.ui.setupUi(self)
 
-		self.ui.btn_add_book.clicked.connect(self.open_add_book)
-		self.ui.btn_remove_book.clicked.connect(self.open_remove_book)
-		self.ui.btn_add_member.clicked.connect(self.open_add_member)
-		self.ui.btn_remove_member.clicked.connect(self.open_remove_member)
-		self.ui.btn_show_books.clicked.connect(self.open_show_books)
-		self.ui.btn_show_members.clicked.connect(self.open_show_members)
-		self.ui.btn_loan_book.clicked.connect(self.open_loan_book)
-		self.ui.btn_return_book.clicked.connect(self.open_return_book)
-	def open_add_book(self):
-		self.add_book_dialog = AddBookView(self.library)
-		self.add_book_dialog.show()
+		self.ui.btn_add_book.clicked.connect(lambda: self.open_window(AddBookView, 'add_book_dialog'))
+		self.ui.btn_remove_book.clicked.connect(lambda: self.open_window(RemoveBookView, 'remove_book_dialog'))
+		self.ui.btn_add_member.clicked.connect(lambda: self.open_window(AddMemberView, 'add_member_dialog'))
+		self.ui.btn_remove_member.clicked.connect(lambda: self.open_window(RemoveMemberView, 'remove_member_dialog'))
+		self.ui.btn_show_books.clicked.connect(lambda: self.open_window(ShowBooksView, 'show_books_dialog'))
+		self.ui.btn_show_members.clicked.connect(lambda: self.open_window(ShowMembersView, 'show_members_dialog'))
+		self.ui.btn_loan_book.clicked.connect(lambda: self.open_window(LoanBookView, 'loan_book_dialog'))
+		self.ui.btn_return_book.clicked.connect(lambda: self.open_window(ReturnBookView, 'return_book_dialog'))
 	
-	def open_remove_book(self):
-		self.remove_book_dialog = RemoveBookView(self.library)
-		self.remove_book_dialog.show()
 	
-	def open_add_member(self):
-		self.add_member_dialog = AddMemberView(self.library)
-		self.add_member_dialog.show()
+	def open_window(self, window_class, attr_name):
+		if not hasattr(self, attr_name) or not getattr(self, attr_name).isVisible():
+			setattr(self, attr_name, window_class(self.controller))
+		window = getattr(self, attr_name)
+		window.show()
+		window.raise_()
+		window.activateWindow()
 
-	def open_remove_member(self):
-		self.remove_member_dialog = RemoveMemberView(self.library)
-		self.remove_member_dialog.show()
-	
-	def open_show_books(self):
-		self.show_books_dialog = ShowBooksView(self.library)
-		self.show_books_dialog.show()
-
-	def open_show_members(self):
-		self.show_members_dialog = ShowMembersView(self.library)
-		self.show_members_dialog.show()
-	def open_loan_book(self):
-		self.loan_book_dialog = LoanBookView(self.library)
-		self.loan_book_dialog.show()
-	def open_return_book(self):
-		self.return_book_dialog = ReturnBookView(self.library)
-		self.return_book_dialog.show()
+	def closeEvent(self, event):
+		for attr in dir(self):
+			if attr.endswith("_dialog"):
+				dialog = getattr(self, attr, None)
+				if dialog and dialog.isVisible():
+					dialog.close()
+		self.controller.close()
+		super().closeEvent(event)
