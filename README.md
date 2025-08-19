@@ -1,36 +1,43 @@
-# 📚 Library Manager — Release v2.0.0
+# 📚 Library Manager — Release v2.2.0
 
 ## 🚀 What's New in This Release
 
-### 🏗 Architecture Upgrade
-- **Migrated to Service Layer Architecture**  
-  The project structure now follows a clear **Service Layer** pattern, with responsibilities split into:
-  - **Controller Layer** → Handles UI interaction, emits update signals to refresh views.
-  - **Service Layer** → Contains all business logic, rules, and validations.
-  - **Data Access Layer** → Manages database session and ORM models.
-- This separation improves:
-  - **Maintainability** (easier to update code without breaking other parts)
-  - **Testability** (services can be tested independently)
-  - **Scalability** (easy to add new features and modules)
+### 🏗 Professional Project Structure
+- The project is reorganized into a **clear and maintainable layout**:
+```
+app/
+├── controllers/       # Handles UI events and user interaction
+├── services/          # Contains business logic and rules, manages database access
+├── models/            # SQLAlchemy ORM models
+├── observability/     # Logging, trace IDs, and helpers
+├── db/                # Database initialization and session
+├── ui/                # PyQt5 UI actions and widgets
+└── views/             # PyQt5 window layouts and forms
 
-### 🔄 Live UI Updates with PyQt5 Signals
-- Introduced **real-time UI updates** using PyQt5 signals:
-  - `books_updated` → Emitted when a book is **added, removed, loaned, or returned**.
-  - `members_updated` → Emitted when a member is **added or removed**.
-- **No more manual window reloads** — tables refresh instantly.
+assets/               # Images and static assets
+scripts/              # CLI entry points for install, uninstall, setup-env
+tests/                # Unit and integration tests
+```
+
+### 🕵️‍♂️ Advanced Observability
+- **Trace ID System**
+  - Each action is tagged with a **unique Trace ID** for debugging and monitoring.
+  - Works for all CRUD operations on books and members.
+- **JSON Log Export**
+  - Logs can now be saved in **JSON format** for auditing or persistent storage.
+  - Makes debugging and analytics straightforward.
 
 ### 🛠 CLI Commands
-We’ve added **console entry points** for easier management:
-
-| Command                | Description |
-|------------------------|-------------|
-| `library-install`      | Creates and initializes the database |
-| `library-run`          | Launches the Library Manager application |
-| `library-uninstall`    | Drops the database |
-| `setup-env`            | Creates the `.env` configuration file |
-| `pip uninstall library_manager` | Uninstalls the package |
+| Command                       | Description |
+|-------------------------------|-------------|
+| `library-install`             | Creates and initializes the database |
+| `library-run`                 | Launches the Library Manager application |
+| `library-uninstall`           | Drops the database |
+| `setup-env`                   | Generates the `.env` configuration file |
+| `pip uninstall library_manager` | Removes the package |
 
 ---
+
 
 ## 📦 Installation & Usage
 
@@ -57,8 +64,8 @@ library-uninstall
 ---
 
 ## 🏷 Version Tag
-**Tag:** `v2.0.0`
+**Tag:** `v2.2.0`
 
 ---
-
-💡 *With the new Service Layer architecture, the project is cleaner, more maintainable, and ready for future features like user authentication, advanced search, and reporting.*
+- Update your `.env` if migrating from v2.2.0.  
+- Old logs may require conversion to JSON format to use new export feature.
