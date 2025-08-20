@@ -11,6 +11,7 @@ app/
 ├── models/            # SQLAlchemy ORM models
 ├── observability/     # Logging, trace IDs, and helpers
 ├── db/                # Database initialization and session
+├── repositories/      # Repository layer for clean database access (Repository Pattern)
 ├── ui/                # PyQt5 UI actions and widgets
 └── views/             # PyQt5 window layouts and forms
 
@@ -27,6 +28,14 @@ tests/                # Unit and integration tests
   - Logs can now be saved in **JSON format** for auditing or persistent storage.
   - Makes debugging and analytics straightforward.
 
+### 🗄 Repository Pattern
+- Introduced the **Repository Pattern** to improve separation of concerns.
+- Database access is now fully abstracted inside dedicated repositories:
+  - `BookRepository`
+  - `MemberRepository`
+  - `LoanRepository`
+- Services no longer handle direct SQLAlchemy queries, making the codebase more testable and maintainable.
+
 ### 🛠 CLI Commands
 | Command                       | Description |
 |-------------------------------|-------------|
@@ -37,7 +46,6 @@ tests/                # Unit and integration tests
 | `pip uninstall library_manager` | Removes the package |
 
 ---
-
 
 ## 📦 Installation & Usage
 
@@ -68,4 +76,5 @@ library-uninstall
 
 ---
 - Update your `.env` if migrating from v2.2.0.  
-- Old logs may require conversion to JSON format to use new export feature.
+- Old logs may require conversion to JSON format to use new export feature.  
+- Repository layer is now required for service-database communication.  

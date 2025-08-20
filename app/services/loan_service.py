@@ -1,6 +1,9 @@
 from app.models.book import Book
 from app.models.member import Member
 from app.models.loan import Loan
+from app.repositories.book_repository import BookRepository
+from app.repositories.member_repository import MemberRepository
+from app.repositories.loan_repository import LoanRepository
 from app.observability.logger import get_logger
 from app.observability.logger_helpers import log_json
 from datetime import datetime, timezone
@@ -13,9 +16,10 @@ logger = get_logger('LoanService')
 class LoanService:
 
 
-	def __init__(self, session):
-		self.db = session
-
+	def __init__(self, db_session):
+		self.book_repo = BookRepository(db_session)
+		self.member_repo = MemberRepository(db_session)
+		self.loan_repo = LoanRepository(db_session)
 
 	def _log(self, level, action, msg, **kwargs):
 
@@ -36,7 +40,7 @@ class LoanService:
 					msg=f'Max borrow limit is {max_borrow_limit}',
 					limit=max_borrow_limit)
 
-			book = self.db.query(Book).filter(Book.isbn == isbn).first()
+			book = self.book_repo.query_by_isbn(isbn).first()
 			
 			if not book:
 				msg = f'Book with ISBN {isbn} not found'
@@ -47,7 +51,7 @@ class LoanService:
 					msg=f'Book "{book.title}" with ISBN {isbn} found.',
 					isbn=isbn, title=book.title)
 
-			member = self.db.query(Member).filter(Member.member_id == member_id).first()
+			member = self.member_repo.query_by_member_id(member_id).first()
 			
 			if not member:
 				msg = f'Member ID {member_id} not found'
@@ -58,10 +62,7 @@ class LoanService:
 					msg=f'Member "{member.name}" with ID {member_id} found.',
 					member_id=member_id, name=member.name)
 
-			active_loans_book = self.db.query(Loan).filter(
-				Loan.member_id == member_id, Loan.returned == False
-			).count()
-			
+			active_loans_book = self.loan_repo.count_active_loans_by_member(member_id).count()
 			self._log("debug", "ACTIVE_LOANS_COUNT",
 					msg=f'Member {member_id} currently has {active_loans_book} active loans.',
 					member_id=member_id, active_loans=active_loans_book)
@@ -90,7 +91,8 @@ class LoanService:
 					member_id=member_id, isbn=isbn)
 
 			book.is_borrowed = True
-			self.db.add(new_loan)
+
+			self.loan_repo.add(new_loan)
 
 			msg = f'Book "{book.title}" loaned to {member.name}.'
 	
@@ -116,7 +118,7 @@ class LoanService:
 					msg=f'Attempting to return book {isbn} for member {member_id}',
 					member_id=member_id, isbn=isbn)
 
-			member = self.db.query(Member).filter(Member.member_id == member_id).first()
+			member = self.member_repo.query_by_member_id(member_id).first()
 	
 			if not member:
 				msg = f'Member ID {member_id} not found'
@@ -128,7 +130,7 @@ class LoanService:
 					msg=f'Member "{member.name}" with ID {member_id} found.',
 					member_id=member_id, name=member.name)
 
-			book = self.db.query(Book).filter(Book.isbn == isbn).first()
+			book = self.book_repo.query_by_isbn(isbn).first()
 	
 			if not book:
 				msg = f'Book ISBN {isbn} not found'
@@ -140,11 +142,7 @@ class LoanService:
 					msg=f'Book "{book.title}" with ISBN {isbn} found.',
 					isbn=isbn, title=book.title)
 
-			loan = self.db.query(Loan).filter(
-				Loan.isbn == isbn,
-				Loan.member_id == member_id,
-				Loan.returned == False
-			).first()
+			loan = self.loan_repo.get_loans_by_member(member_id, isbn).first()
 	
 			if not loan:
 				msg = f'Book {isbn} was not loaned by member {member_id}'
@@ -156,7 +154,7 @@ class LoanService:
 					msg=f'Active loan found for book {isbn} and member {member_id}.',
 					loan_id=loan.id, member_id=member_id, isbn=isbn)
 
-			loan.returned = True
+			self.loan_repo.mark_returned(loan)
 	
 			book.is_borrowed = False
 	

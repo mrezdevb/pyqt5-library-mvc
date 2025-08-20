@@ -1,6 +1,8 @@
 from app.models.member import Member
 from app.models.loan import Loan
 from app.models.book import Book
+from app.repositories.member_repository import MemberRepository
+from app.repositories.loan_repository import LoanRepository
 from app.observability.logger import get_logger
 from app.observability.logger_helpers import log_json
 from sqlalchemy.orm import joinedload
@@ -11,7 +13,8 @@ logger = get_logger('MemberService')
 
 class MemberService:
     def __init__(self, session):
-        self.db = session
+        self.member_repo = MemberRepository(session)
+        self.loan_repo = LoanRepository(session)
 
     def _log(self, level, action, msg, **kwargs):
         log_json(logger, level, action, msg=msg, **kwargs)
@@ -22,7 +25,7 @@ class MemberService:
                       msg=f'Attempting to add member "{name}" with ID {member_id}',
                       name=name, member_id=member_id)
 
-            existing_member = self.db.query(Member).filter(Member.member_id == member_id).first()
+            existing_member = self.member_repo.query_by_member_id(member_id).first()
             if existing_member:
                 msg = f'Member with ID {member_id} already exists.'
                 self._log('warning', 'MEMBER_ADD_EXISTS',
@@ -34,7 +37,7 @@ class MemberService:
                       name=name, member_id=member_id)
 
             new_member = Member(name=name, member_id=member_id)
-            self.db.add(new_member)
+            self.member_repo.add(new_member)
 
             self._log('debug', 'MEMBER_ADD_PENDING_COMMIT',
                       msg=f'Member "{name}" with ID {member_id} pending commit.',
@@ -58,7 +61,7 @@ class MemberService:
                       msg=f'Attempting to remove member {member_id}',
                       member_id=member_id)
 
-            member = self.db.query(Member).filter(Member.member_id == member_id).first()
+            member = self.member_repo.query_by_member_id(member_id).first()
             if not member:
                 msg = f"Member with ID {member_id} not found."
                 self._log('warning', 'MEMBER_REMOVE_NOT_FOUND',
@@ -69,7 +72,8 @@ class MemberService:
                       msg=f'Member "{member.name}" with ID {member_id} found.',
                       member_id=member_id)
 
-            loans = self.db.query(Loan).filter(Loan.member_id == member_id).all()
+            loans = self.loan_repo.query_get_loans_member(member_id).all()
+
             self._log('info', 'MEMBER_REMOVE_LOANS_FOUND',
                       msg=f'Member {member_id} has {len(loans)} loan(s).',
                       member_id=member_id, loans_count=len(loans))
@@ -84,8 +88,7 @@ class MemberService:
                     self._log('warning', 'LOAN_NO_BOOK',
                               msg=f'Loan ID {loan.id} has no linked book record.',
                               loan_id=loan.id)
-
-                self.db.delete(loan)
+                self.loan_repo.remove(loan)
                 self._log('debug', 'LOAN_PENDING_DELETE',
                           msg=f'Loan {loan.id} pending delete.',
                           loan_id=loan.id)
@@ -93,7 +96,7 @@ class MemberService:
                           msg=f'Loan {loan.id} deleted.',
                           loan_id=loan.id)
 
-            self.db.delete(member)
+            self.member_repo.remove(member)
             self._log('debug', 'MEMBER_PENDING_DELETE',
                       msg=f'Member {member_id} pending delete.',
                       member_id=member_id)
@@ -145,9 +148,7 @@ class MemberService:
             self._log('info', 'MEMBER_FETCH_START',
                       msg='Retrieving all members from database.')
 
-            members = self.db.query(Member).options(
-                joinedload(Member.loans).joinedload(Loan.book)
-            ).all()
+            members = self.member_repo.get_members_with_loans_and_books().all()
 
             if not members:
                 self._log('info', 'MEMBER_FETCH_EMPTY',
@@ -172,12 +173,7 @@ class MemberService:
                       msg=f'Searching members with keyword "{keyword}".',
                       keyword=keyword)
 
-            results = self.db.query(Member).options(
-                joinedload(Member.loans).joinedload(Loan.book)
-            ).filter(
-                Member.name.ilike(f'%{keyword}%') |
-                Member.member_id.ilike(f'%{keyword}%')
-            ).all()
+            results = self.member_repo.search_members_with_loans_and_books(keyword).all()
 
             if not results:
                 self._log('info', 'MEMBER_SEARCH_EMPTY',

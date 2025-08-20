@@ -1,4 +1,6 @@
 from app.models.book import Book
+from app.db.db import SessionLocal
+from app.repositories.book_repository import BookRepository
 from app.observability.logger import get_logger
 from app.observability.logger_helpers import log_json
 
@@ -8,8 +10,8 @@ logger = get_logger('BookService')
 
 class BookService:
 	def __init__(self, db_session):
-		self.db = db_session
-	
+		self.book_repo = BookRepository(db_session)
+
 
 	def _log(self, level, action, msg, **kwargs):
 
@@ -23,7 +25,7 @@ class BookService:
 					msg=f'Attempting to add book "{title}" (ISBN {isbn})',
 					title=title, author=author, isbn=isbn)
 
-			existing_book = self.db.query(Book).filter(Book.isbn == isbn).first()
+			existing_book = self.book_repo.query_by_isbn(isbn).first()
 			if existing_book:
 				msg = f'Book with ISBN {isbn} already exists.'
 				self._log("warning", "BOOK_ADD_EXISTS",
@@ -40,7 +42,7 @@ class BookService:
 					msg=f'Book "{title}" (ISBN {isbn}) pending commit.',
 					title=title, author=author, isbn=isbn)
 
-			self.db.add(new_book)
+			self.book_repo.add(new_book)
 
 			msg = f'Book "{title}" (ISBN {isbn}) successfully added.'
 			self._log("info", "BOOK_ADD_SUCCESS",
@@ -61,7 +63,7 @@ class BookService:
 					msg=f'Attempting to remove book with ISBN {isbn}',
 					isbn=isbn)
 
-			book = self.db.query(Book).filter(Book.isbn == isbn).first()
+			book = self.book_repo.query_by_isbn(isbn).first()
 			if not book:
 				msg = f'Book with ISBN {isbn} not found.'
 				self._log("warning", "BOOK_REMOVE_NOT_FOUND",
@@ -76,7 +78,7 @@ class BookService:
 					msg=f'Book "{book.title}" (ISBN {isbn}) pending delete.',
 					title=book.title, isbn=isbn)
 
-			self.db.delete(book)
+			self.book_repo.remove(book)
 
 			msg = f'Book "{book.title}" (ISBN {isbn}) removed successfully.'
 			self._log("info", "BOOK_REMOVE_SUCCESS",
@@ -99,11 +101,11 @@ class BookService:
 			if filter_option == 'All Books':
 				self._log("debug", "BOOK_FETCH_ALL",
 						msg='Fetching all books from database.')
-				books = self.db.query(Book).all()
+				books = self.book_repo.query_all().all()
 			else:
 				self._log("debug", "BOOK_FETCH_AVAILABLE",
 						msg='Fetching only available (not borrowed) books.')
-				books = self.db.query(Book).filter(Book.is_borrowed == False).all()
+				books = self.book_repo.query_by_borrowed_status(False).all()
 
 			self._log("debug", "BOOK_FETCH_QUERY_DONE",
 					msg=f'Query executed for filter "{filter_option}".',
@@ -135,11 +137,7 @@ class BookService:
 					msg=f'Searching books with keyword "{keyword}" and filter "{filter_option}"',
 					keyword=keyword, filter_option=filter_option)
 
-			base_query = self.db.query(Book).filter(
-				Book.title.ilike(f'%{keyword}%') |
-				Book.author.ilike(f'%{keyword}%') |
-				Book.isbn.ilike(f'%{keyword}%')
-			)
+			base_query = self.book_repo.query_by_keyword(keyword)
 			self._log("debug", "BOOK_SEARCH_QUERY_BUILD",
 					msg="Base query built for searching books.",
 					keyword=keyword, filter_option=filter_option)
@@ -160,11 +158,11 @@ class BookService:
 					keyword=keyword, filter_option=filter_option)
 
 			if filter_option != 'All Books':
+
 				self._log("debug", "BOOK_SEARCH_FILTER_APPLIED",
 						msg="Applying availability filter (only not borrowed).",
 						keyword=keyword, filter_option=filter_option)
-
-				available_books = [b for b in all_results if not b.is_borrowed]
+				available_books = self.book_repo.query_available_books(keyword).all()
 
 				if not available_books:
 					msg = f'Books matching "{keyword}" are borrowed.'
