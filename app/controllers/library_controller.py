@@ -1,7 +1,7 @@
 from app.services.book_service import BookService
 from app.services.member_service import MemberService
 from app.services.loan_service import LoanService
-from app.db.db import SessionLocal
+from app.db.unit_of_work import UnitOfWork
 from PyQt5.QtCore import QObject, pyqtSignal
 from app.observability.log_context import set_trace_id, set_user_id, set_extra_data, clear_context, get_trace_id
 from app.observability.logger import get_logger
@@ -20,13 +20,13 @@ class LibraryController(QObject):
 	members_updated = pyqtSignal()
 
 
-	def __init__(self, session=None):
+	def __init__(self, uow=None):
 
 		super().__init__()
-		self.session = session or SessionLocal()
-		self.book_service = BookService(self.session)
-		self.member_service = MemberService(self.session)
-		self.loan_service = LoanService(self.session)
+		self.uow = uow or UnitOfWork()
+		self.book_service = BookService(self.uow)
+		self.member_service = MemberService(self.uow)
+		self.loan_service = LoanService(self.uow)
 
 
 
@@ -42,10 +42,10 @@ class LibraryController(QObject):
 		})
 
 		if ok:
-			self.session.commit()
+			self.uow.commit()
 
 		else:
-			self.session.rollback()
+			self.uow.rollback()
 
 		return ok
 	
@@ -147,4 +147,4 @@ class LibraryController(QObject):
 
 	
 	def close(self):
-		self.session.close()
+		self.uow.close()

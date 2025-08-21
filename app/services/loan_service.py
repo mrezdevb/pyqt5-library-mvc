@@ -1,12 +1,10 @@
 from app.models.book import Book
 from app.models.member import Member
 from app.models.loan import Loan
-from app.repositories.book_repository import BookRepository
-from app.repositories.member_repository import MemberRepository
-from app.repositories.loan_repository import LoanRepository
 from app.observability.logger import get_logger
 from app.observability.logger_helpers import log_json
 from datetime import datetime, timezone
+from app.db.unit_of_work import UnitOfWork
 import os
 
 
@@ -16,10 +14,11 @@ logger = get_logger('LoanService')
 class LoanService:
 
 
-	def __init__(self, db_session):
-		self.book_repo = BookRepository(db_session)
-		self.member_repo = MemberRepository(db_session)
-		self.loan_repo = LoanRepository(db_session)
+	def __init__(self, uow: UnitOfWork):
+		self.uow = uow
+		self.book_repo = uow.book_repo
+		self.member_repo = uow.member_repo
+		self.loan_repo = uow.loan_repo
 
 	def _log(self, level, action, msg, **kwargs):
 

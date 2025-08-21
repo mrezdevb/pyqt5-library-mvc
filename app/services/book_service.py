@@ -1,16 +1,15 @@
 from app.models.book import Book
-from app.db.db import SessionLocal
-from app.repositories.book_repository import BookRepository
 from app.observability.logger import get_logger
 from app.observability.logger_helpers import log_json
-
+from app.db.unit_of_work import UnitOfWork
 
 logger = get_logger('BookService')
 
 
 class BookService:
-	def __init__(self, db_session):
-		self.book_repo = BookRepository(db_session)
+	def __init__(self, uow: UnitOfWork):
+		self.uow = uow
+		self.book_repo = uow.book_repo
 
 
 	def _log(self, level, action, msg, **kwargs):

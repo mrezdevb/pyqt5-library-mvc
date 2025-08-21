@@ -1,20 +1,19 @@
 from app.models.member import Member
 from app.models.loan import Loan
 from app.models.book import Book
-from app.repositories.member_repository import MemberRepository
-from app.repositories.loan_repository import LoanRepository
 from app.observability.logger import get_logger
 from app.observability.logger_helpers import log_json
 from sqlalchemy.orm import joinedload
-
+from app.db.unit_of_work import UnitOfWork
 
 logger = get_logger('MemberService')
 
 
 class MemberService:
-    def __init__(self, session):
-        self.member_repo = MemberRepository(session)
-        self.loan_repo = LoanRepository(session)
+    def __init__(self, uow: UnitOfWork):
+        self.uow = uow
+        self.member_repo = uow.member_repo
+        self.loan_repo = uow.loan_repo
 
     def _log(self, level, action, msg, **kwargs):
         log_json(logger, level, action, msg=msg, **kwargs)
