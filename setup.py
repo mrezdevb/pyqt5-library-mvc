@@ -17,7 +17,7 @@ with open('requirements.txt') as f:
 
 setup(
 	name='library_manager',
-	version='2.5.0',
+	version='2.6.0',
 	packages=find_packages(),
 	install_requires=requirements,
 	include_package_data=True,
