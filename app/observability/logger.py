@@ -4,20 +4,20 @@ import logging
 import json
 from datetime import datetime
 from .log_context import get_trace_id, get_user_id, get_extra_data
+from typing import Any
 
-
-BASE_DIR = os.path.abspath(os.getcwd())  
-LOG_DIR = os.path.join(BASE_DIR, "logs")
+BASE_DIR: str = os.path.abspath(os.getcwd())  
+LOG_DIR: str = os.path.join(BASE_DIR, "logs")
 os.makedirs(LOG_DIR, exist_ok=True)
-LOG_FILE = os.path.join(LOG_DIR, "library.log")
+LOG_FILE: str = os.path.join(LOG_DIR, "library.log")
 
 
 
 
 
 class JsonFormatter(logging.Formatter):
-    def format(self, record):
-        log_data = {
+    def format(self, record: logging.LogRecord) -> str:
+        log_data: dict[str, Any] = {
             "timestamp": datetime.utcnow().isoformat() + "Z",
             "level": record.levelname,
             "logger": record.name,
@@ -33,15 +33,15 @@ class JsonFormatter(logging.Formatter):
 
 
 def get_logger(name: str) -> logging.Logger:
-    logger = logging.getLogger(name)
+    logger: logging.Logger = logging.getLogger(name)
     if not logger.handlers:
       
-        consule_handler = logging.StreamHandler(sys.stdout)
+        consule_handler: logging.StreamHandler = logging.StreamHandler(sys.stdout)
         consule_handler.setFormatter(JsonFormatter())
         logger.addHandler(consule_handler)
 
      
-        file_handler = logging.FileHandler(LOG_FILE, encoding="utf-8")
+        file_handler: logging.FileHandler = logging.FileHandler(LOG_FILE, encoding="utf-8")
         file_handler.setFormatter(JsonFormatter())
         logger.addHandler(file_handler)
 

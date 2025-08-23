@@ -9,10 +9,10 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-
+from PyQt5.QtWidgets import QMainWindow, QApplication
 
 class Ui_AddBook(object):
-    def setupUi(self, MainWindow):
+    def setupUi(self, MainWindow: QMainWindow) -> None:
         MainWindow.setFixedSize(800, 600)
         MainWindow.setObjectName("AddBook")
         MainWindow.resize(800, 597)
@@ -91,7 +91,7 @@ class Ui_AddBook(object):
 
 
 
-    def retranslateUi(self, MainWindow):
+    def retranslateUi(self, MainWindow: QMainWindow) -> None:
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "Add Book"))
         self.label_title.setText(_translate("MainWindow", "Title"))
@@ -104,9 +104,9 @@ class Ui_AddBook(object):
 
 if __name__ == "__main__":
     import sys
-    app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QMainWindow()
-    ui = Ui_AddBook()
+    app: QApplication = QtWidgets.QApplication(sys.argv)
+    MainWindow: QMainWindow = QtWidgets.QMainWindow()
+    ui: Ui_AddBook = Ui_AddBook()
     ui.setupUi(MainWindow)
     MainWindow.show()
     sys.exit(app.exec_())

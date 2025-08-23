@@ -1,30 +1,33 @@
 import psycopg2
 from dotenv import load_dotenv
 import os
+from psycopg2.extensions import cursor as Psycopgcursor, connection as Psycopgconnection
+from typing import Tuple, Optional
 
 
 load_dotenv()
 
 
-defualt_db = 'postgres'
-db_name = os.getenv('DB_NAME')
-db_user = os.getenv('DB_USER')
-db_password = os.getenv('DB_PASSWORD')
-db_host = os.getenv('DB_HOST', 'localhost')
+
+default_db:str = 'postgres'
+db_name: str = os.getenv('DB_NAME')
+db_user: str = os.getenv('DB_USER')
+db_password: str = os.getenv('DB_PASSWORD')
+db_host: str = os.getenv('DB_HOST', 'localhost')
 
 
 
 
 
 
-def drop_database():
-	connection = psycopg2.connect(dbname=defualt_db, user=db_user, password=db_password, host=db_host)
+def drop_database() -> None:
+	connection: Psycopgconnection = psycopg2.connect(dbname=default_db, user=db_user, password=db_password, host=db_host)
 	connection.autocommit = True
-	cursor = connection.cursor()
+	cursor: Psycopgcursor = connection.cursor()
 
 
 	cursor.execute('SELECT 1 FROM pg_database WHERE datname=%s', (db_name,))
-	exists = cursor.fetchone()
+	exists: Optional[Tuple] = cursor.fetchone()
 	
 	
 	if exists:

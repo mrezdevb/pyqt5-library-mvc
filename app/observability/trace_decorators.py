@@ -2,16 +2,17 @@ import uuid
 from functools import wraps
 from app.observability.log_context import set_trace_id
 from app.observability.logger import get_logger
-
+from typing import Any, Callable, TypeVar
 
 log = get_logger('Tracer')
 
 
+F = TypeVar('F', bound=Callable[..., Any])
 
-def traced(action_name):
-	def decorator(func):
+def traced(action_name: str) -> Callable[[F], F]  :
+	def decorator(func: F) -> F:
 		@wraps(func)
-		def wrapper(*args, **kwargs):
+		def wrapper(*args: Any, **kwargs: Any) -> Any:
 			trace_id = uuid.uuid4().hex[:8]
 			set_trace_id(trace_id)
 			log.info(f'[TRACE] {action_name} started')

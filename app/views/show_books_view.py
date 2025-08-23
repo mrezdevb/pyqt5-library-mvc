@@ -2,10 +2,11 @@ from PyQt5.QtWidgets import QMainWindow, QTableWidgetItem, QMessageBox
 from app.ui.show_books import Ui_ShowBooks
 from PyQt5.QtCore import Qt
 from app.controllers.library_controller import LibraryController
+from app.models.book import Book
+from typing import List, Iterable, Optional, Literal
 
-
-def create_readonly_item(text):
-    item = QTableWidgetItem(text)
+def create_readonly_item(text: str) -> QTableWidgetItem:
+    item: QTableWidgetItem = QTableWidgetItem(text)
     item.setFlags(item.flags() & ~Qt.ItemIsEditable)
     return item
 
@@ -14,15 +15,15 @@ def create_readonly_item(text):
 
 class ShowBooksView(QMainWindow):
 
-    def __init__(self, controller, main_view=None):
+    def __init__(self, controller: LibraryController, main_view: Optional[QMainWindow] = None) -> None:
         super(ShowBooksView, self).__init__()
-        self.ui = Ui_ShowBooks()
+        self.ui: Ui_ShowBooks = Ui_ShowBooks()
         self.ui.setupUi(self)
-        self.controller = controller
-        self.main_view = main_view
+        self.controller: LibraryController = controller
+        self.main_view: Optional[QMainWindow] = main_view
         self._setup_table_headers()
-        self.last_search_keyword = ''
-        self.last_filter_option = 'All Books'
+        self.last_search_keyword: str = ''
+        self.last_filter_option: str = 'All Books'
         self.load_books()
         controller.books_updated.connect(self.load_books)
         self.ui.search_btn.clicked.connect(self.search_books)
@@ -30,25 +31,28 @@ class ShowBooksView(QMainWindow):
 
 
 
-    def _setup_table_headers(self):
+    def _setup_table_headers(self) -> None:
         self.ui.table_books.setColumnCount(4)
         self.ui.table_books.setHorizontalHeaderLabels(['Title', 'Author', 'ISBN', 'Status'])
 
 
 
-    def populate_table(self, books):
+    def populate_table(self, books: Iterable[Book]) -> None:
         self.ui.table_books.setRowCount(len(books))
         
         for row, book in enumerate(books):
             self.ui.table_books.setItem(row, 0, create_readonly_item(book.title))
             self.ui.table_books.setItem(row, 1, create_readonly_item(book.author))
             self.ui.table_books.setItem(row, 2, create_readonly_item(book.isbn))
-            status_text = 'Borrowed' if book.is_borrowed else 'Available'
+            status_text: str = 'Borrowed' if book.is_borrowed else 'Available'
             self.ui.table_books.setItem(row, 3, create_readonly_item(status_text))
 
 
-    def load_books(self):
+    def load_books(self) -> None:
+
         if self.last_search_keyword:
+            books: List[Book]
+            status: Literal['not found', 'borrowed', 'ok']
             books, status = self.controller.search_books(self.last_search_keyword, self.last_filter_option)
             
             if status == 'not found':
@@ -58,27 +62,29 @@ class ShowBooksView(QMainWindow):
 
 
         else:
-            self.last_filter_option = self.ui.filter_combo.currentText()
-            books= self.controller.show_books(self.last_filter_option) or []
+            self.last_filter_option: str = self.ui.filter_combo.currentText()
+            books: List[Book]= self.controller.show_books(self.last_filter_option) or []
             self.populate_table(books)
 
 
 
 
     def search_books(self):
-        keyword = self.ui.search_input.text().strip()
+    
+        keyword: str = self.ui.search_input.text().strip()
 
-        self.last_search_keyword = keyword if keyword else ''
+        self.last_search_keyword: str = keyword if keyword else ''
 
-        self.last_filter_option = self.ui.filter_combo.currentText()
+        self.last_filter_option: str = self.ui.filter_combo.currentText()
 
 
         if not keyword:
             self.load_books()
             return
-        
 
-        filter_option = self.last_filter_option
+        filter_option: str = self.last_filter_option
+        books: List[Book]
+        status: Literal['not found', 'borrowed', 'ok']
         books, status = self.controller.search_books(keyword, filter_option)
 
 

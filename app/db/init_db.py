@@ -5,7 +5,7 @@ from app.db.db import engine
 
 
 
-def init_db():
+def init_db() -> None:
 	Base.metadata.create_all(bind=engine)
 	print('tables created successfully')
 

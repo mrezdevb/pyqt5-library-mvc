@@ -2,31 +2,34 @@ from app.models.book import Book
 from app.observability.logger import get_logger
 from app.observability.logger_helpers import log_json
 from app.db.unit_of_work import UnitOfWork
-
+from app.repositories.book_repository import BookRepository
+from logging import Logger
+from typing import Any, Tuple, Optional, List
+from sqlalchemy.orm import Query
 logger = get_logger('BookService')
 
 
 class BookService:
-	def __init__(self, uow: UnitOfWork):
-		self.uow = uow
-		self.book_repo = uow.book_repo
+	def __init__(self, uow: UnitOfWork) -> None:
+		self.uow: UnitOfWork = uow
+		self.book_repo: BookRepository = uow.book_repo
 
 
-	def _log(self, level, action, msg, **kwargs):
+	def _log(self, level: str, action: str, msg: str, **kwargs: Any) -> None:
 
 		log_json(logger, level, action, msg=msg, **kwargs)
 
 
 
-	def add_book(self, title, author, isbn):
+	def add_book(self, title: str, author: str, isbn: str) -> Tuple[bool, str]:
 		try:
 			self._log("info", "BOOK_ADD_START",
 					msg=f'Attempting to add book "{title}" (ISBN {isbn})',
 					title=title, author=author, isbn=isbn)
 
-			existing_book = self.book_repo.query_by_isbn(isbn).first()
+			existing_book: Optional[Book] = self.book_repo.query_by_isbn(isbn).first()
 			if existing_book:
-				msg = f'Book with ISBN {isbn} already exists.'
+				msg: str = f'Book with ISBN {isbn} already exists.'
 				self._log("warning", "BOOK_ADD_EXISTS",
 						msg=msg, isbn=isbn, title=existing_book.title)
 				return False, msg
@@ -35,7 +38,7 @@ class BookService:
 					msg=f'Book "{title}" with ISBN {isbn} is valid for creation.',
 					title=title, author=author, isbn=isbn)
 
-			new_book = Book(title=title, author=author, isbn=isbn)
+			new_book: Book = Book(title=title, author=author, isbn=isbn)
 
 			self._log("debug", "BOOK_ADD_PENDING_COMMIT",
 					msg=f'Book "{title}" (ISBN {isbn}) pending commit.',
@@ -43,7 +46,7 @@ class BookService:
 
 			self.book_repo.add(new_book)
 
-			msg = f'Book "{title}" (ISBN {isbn}) successfully added.'
+			msg: str = f'Book "{title}" (ISBN {isbn}) successfully added.'
 			self._log("info", "BOOK_ADD_SUCCESS",
 					msg=msg, title=title, author=author, isbn=isbn)
 
@@ -56,15 +59,15 @@ class BookService:
 			raise
 
 
-	def remove_book(self, isbn):
+	def remove_book(self, isbn: str) -> Tuple[bool, str]:
 		try:
 			self._log("info", "BOOK_REMOVE_START",
 					msg=f'Attempting to remove book with ISBN {isbn}',
 					isbn=isbn)
 
-			book = self.book_repo.query_by_isbn(isbn).first()
+			book: Optional[Book] = self.book_repo.query_by_isbn(isbn).first()
 			if not book:
-				msg = f'Book with ISBN {isbn} not found.'
+				msg: str = f'Book with ISBN {isbn} not found.'
 				self._log("warning", "BOOK_REMOVE_NOT_FOUND",
 						msg=msg, isbn=isbn)
 				return False, msg
@@ -79,7 +82,7 @@ class BookService:
 
 			self.book_repo.remove(book)
 
-			msg = f'Book "{book.title}" (ISBN {isbn}) removed successfully.'
+			msg: str = f'Book "{book.title}" (ISBN {isbn}) removed successfully.'
 			self._log("info", "BOOK_REMOVE_SUCCESS",
 					msg=msg, title=book.title, isbn=isbn)
 
@@ -91,7 +94,7 @@ class BookService:
 					isbn=isbn, error=str(e))
 			raise
 
-	def show_books(self, filter_option):
+	def show_books(self, filter_option: str) -> List[Book]:
 		try:
 			self._log("info", "BOOK_FETCH_START",
 					msg=f'Retrieving books with filter "{filter_option}"',
@@ -100,11 +103,11 @@ class BookService:
 			if filter_option == 'All Books':
 				self._log("debug", "BOOK_FETCH_ALL",
 						msg='Fetching all books from database.')
-				books = self.book_repo.query_all().all()
+				books: List[Book] = self.book_repo.query_all().all()
 			else:
 				self._log("debug", "BOOK_FETCH_AVAILABLE",
 						msg='Fetching only available (not borrowed) books.')
-				books = self.book_repo.query_by_borrowed_status(False).all()
+				books: List[Book] = self.book_repo.query_by_borrowed_status(False).all()
 
 			self._log("debug", "BOOK_FETCH_QUERY_DONE",
 					msg=f'Query executed for filter "{filter_option}".',
@@ -130,18 +133,18 @@ class BookService:
 
 
 
-	def search_books(self, keyword, filter_option):
+	def search_books(self, keyword: Optional[str], filter_option: str) -> Tuple[List[Book], str]:
 		try:
 			self._log("info", "BOOK_SEARCH_START",
 					msg=f'Searching books with keyword "{keyword}" and filter "{filter_option}"',
 					keyword=keyword, filter_option=filter_option)
 
-			base_query = self.book_repo.query_by_keyword(keyword)
+			base_query: Query[Book] = self.book_repo.query_by_keyword(keyword)
 			self._log("debug", "BOOK_SEARCH_QUERY_BUILD",
 					msg="Base query built for searching books.",
 					keyword=keyword, filter_option=filter_option)
 
-			all_results = base_query.all()
+			all_results: List[Book] = base_query.all()
 			self._log("debug", "BOOK_SEARCH_QUERY_EXECUTED",
 					msg=f'Query executed, {len(all_results)} result(s) found.',
 					keyword=keyword, filter_option=filter_option, results_count=len(all_results))
@@ -161,7 +164,7 @@ class BookService:
 				self._log("debug", "BOOK_SEARCH_FILTER_APPLIED",
 						msg="Applying availability filter (only not borrowed).",
 						keyword=keyword, filter_option=filter_option)
-				available_books = self.book_repo.query_available_books(keyword).all()
+				available_books: Optional[List[Book]] = self.book_repo.query_available_books(keyword).all()
 
 				if not available_books:
 					msg = f'Books matching "{keyword}" are borrowed.'

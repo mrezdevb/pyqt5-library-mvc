@@ -2,19 +2,18 @@ import sys
 
 
 
-
-def main():
+def main() -> None:
     from PyQt5.QtWidgets import QApplication
     from app.views.main_window import MainView
     from app.controllers.library_controller import LibraryController
     from app.db.unit_of_work import UnitOfWork
     from app.config.settings import settings
     from app.db.db import SessionLocal
-    uow = UnitOfWork(SessionLocal)
-    controller = LibraryController(uow)
-    app = QApplication(sys.argv)
+    uow: UnitOfWork = UnitOfWork(SessionLocal)
+    controller: LibraryController = LibraryController(uow)
+    app: QApplication = QApplication(sys.argv)
 
-    window = MainView(controller)
+    window: MainView = MainView(controller)
     window.show()
 
 

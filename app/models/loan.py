@@ -1,16 +1,16 @@
 from sqlalchemy import Column, Integer, ForeignKey, DateTime, Boolean, String
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, Mapped, mapped_column
 from .base import Base
 from datetime import datetime, timezone
 
 
 class Loan(Base):
 	__tablename__ = 'loans'
-	id = Column(Integer, primary_key=True, index=True)
-	member_id = Column(String, ForeignKey('members.member_id'), nullable=False)
-	isbn = Column(String, ForeignKey('books.isbn'), nullable=False)
-	loan_date = Column(DateTime, default=datetime.now(timezone.utc))
-	returned = Column(Boolean, default=False, nullable=False)
+	id: Mapped[int] = mapped_column(Integer, primary_key=True, index=True)
+	member_id: Mapped[str] = mapped_column(String, ForeignKey('members.member_id'), nullable=False)
+	isbn:Mapped[str] = mapped_column(String, ForeignKey('books.isbn'), nullable=False)
+	loan_date: Mapped[datetime] = mapped_column(DateTime, default=datetime.now(timezone.utc))
+	returned: Mapped[bool]= mapped_column(Boolean, default=False, nullable=False)
 
 	member = relationship('Member', back_populates='loans')
 	book = relationship('Book', back_populates='loans')

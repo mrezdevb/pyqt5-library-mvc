@@ -9,14 +9,14 @@ from app.views.show_books_view import ShowBooksView
 from app.views.show_members_view import ShowMembersView
 from app.views.loan_book_view import LoanBookView
 from app.views.return_book_view import ReturnBookView
-from app.db.db import SessionLocal
-
+from typing import Any
+from PyQt5.QtGui import QCloseEvent
 class MainView(QtWidgets.QMainWindow):
 
 	def __init__(self, controller: LibraryController):
 		super().__init__()
-		self.controller = controller
-		self.ui = Ui_MainWindow()
+		self.controller: LibraryController = controller
+		self.ui: Ui_MainWindow = Ui_MainWindow()
 		self.ui.setupUi(self)
 
 
@@ -33,19 +33,19 @@ class MainView(QtWidgets.QMainWindow):
 	
 
 
-	def open_window(self, window_class, attr_name):
+	def open_window(self, window_class, attr_name) -> None:
 		if not hasattr(self, attr_name) or not getattr(self, attr_name).isVisible():
 			setattr(self, attr_name, window_class(self.controller))
 
 
-		window = getattr(self, attr_name)
+		window: Any = getattr(self, attr_name)
 		window.show()
 		window.raise_()
 		window.activateWindow()
 
 
 
-	def closeEvent(self, event):
+	def closeEvent(self, event: QCloseEvent) -> None:
 		for attr in dir(self):
 			if attr.endswith("_dialog"):
 				dialog = getattr(self, attr, None)

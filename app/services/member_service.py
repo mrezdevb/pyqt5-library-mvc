@@ -3,30 +3,33 @@ from app.models.loan import Loan
 from app.models.book import Book
 from app.observability.logger import get_logger
 from app.observability.logger_helpers import log_json
-from sqlalchemy.orm import joinedload
 from app.db.unit_of_work import UnitOfWork
+from typing import Optional, List, Tuple, Any, Union
+from app.repositories.member_repository import MemberRepository
+from app.repositories.loan_repository import LoanRepository
+
 
 logger = get_logger('MemberService')
 
 
 class MemberService:
-    def __init__(self, uow: UnitOfWork):
-        self.uow = uow
-        self.member_repo = uow.member_repo
-        self.loan_repo = uow.loan_repo
+    def __init__(self, uow: UnitOfWork) -> None:
+        self.uow: UnitOfWork = uow
+        self.member_repo: MemberRepository = uow.member_repo
+        self.loan_repo: LoanRepository = uow.loan_repo
 
-    def _log(self, level, action, msg, **kwargs):
+    def _log(self, level: str, action: str, msg: str, **kwargs: Any) -> None:
         log_json(logger, level, action, msg=msg, **kwargs)
 
-    def add_member(self, name, member_id):
+    def add_member(self, name: str, member_id: str) -> Tuple[bool, str]:
         try:
             self._log('info', 'MEMBER_ADD_START',
                       msg=f'Attempting to add member "{name}" with ID {member_id}',
                       name=name, member_id=member_id)
 
-            existing_member = self.member_repo.query_by_member_id(member_id).first()
+            existing_member: Optional[Member] = self.member_repo.query_by_member_id(member_id).first()
             if existing_member:
-                msg = f'Member with ID {member_id} already exists.'
+                msg: str = f'Member with ID {member_id} already exists.'
                 self._log('warning', 'MEMBER_ADD_EXISTS',
                           msg=msg, member_id=member_id)
                 return False, msg
@@ -35,14 +38,14 @@ class MemberService:
                       msg=f'Member "{name}" with ID {member_id} is valid for creation.',
                       name=name, member_id=member_id)
 
-            new_member = Member(name=name, member_id=member_id)
+            new_member: Member = Member(name=name, member_id=member_id)
             self.member_repo.add(new_member)
 
             self._log('debug', 'MEMBER_ADD_PENDING_COMMIT',
                       msg=f'Member "{name}" with ID {member_id} pending commit.',
                       name=name, member_id=member_id)
 
-            msg = f'Member "{name}" with ID {member_id} successfully added.'
+            msg: str = f'Member "{name}" with ID {member_id} successfully added.'
             self._log('info', 'MEMBER_ADD_SUCCESS',
                       msg=msg, name=name, member_id=member_id)
 
@@ -54,15 +57,15 @@ class MemberService:
                       name=name, member_id=member_id, error=str(e))
             raise
 
-    def remove_member(self, member_id):
+    def remove_member(self, member_id: str) -> Tuple[bool, str]:
         try:
             self._log('info', 'MEMBER_REMOVE_START',
                       msg=f'Attempting to remove member {member_id}',
                       member_id=member_id)
 
-            member = self.member_repo.query_by_member_id(member_id).first()
+            member: Optional[Member] = self.member_repo.query_by_member_id(member_id).first()
             if not member:
-                msg = f"Member with ID {member_id} not found."
+                msg: str = f"Member with ID {member_id} not found."
                 self._log('warning', 'MEMBER_REMOVE_NOT_FOUND',
                           msg=msg, member_id=member_id)
                 return False, msg
@@ -71,7 +74,7 @@ class MemberService:
                       msg=f'Member "{member.name}" with ID {member_id} found.',
                       member_id=member_id)
 
-            loans = self.loan_repo.query_get_loans_member(member_id).all()
+            loans: List[Loan] = self.loan_repo.query_get_loans_member(member_id).all()
 
             self._log('info', 'MEMBER_REMOVE_LOANS_FOUND',
                       msg=f'Member {member_id} has {len(loans)} loan(s).',
@@ -100,7 +103,7 @@ class MemberService:
                       msg=f'Member {member_id} pending delete.',
                       member_id=member_id)
 
-            msg = f"Member {member_id} removed and all borrowed books released."
+            msg: str = f"Member {member_id} removed and all borrowed books released."
             self._log('info', 'MEMBER_REMOVE_SUCCESS',
                       msg=msg, member_id=member_id)
 
@@ -112,15 +115,15 @@ class MemberService:
                       member_id=member_id, error=str(e))
             raise
 
-    def _format_members(self, members):
+    def _format_members(self, members: List[Member]) -> List[dict]:
         try:
             self._log('debug', 'MEMBER_FORMAT_START',
                       msg=f'Formatting {len(members)} member(s).',
                       members_count=len(members))
 
-            result = []
+            result: List = []
             for member in members:
-                borrowed_books = [loan.book.title for loan in member.loans if not loan.returned]
+                borrowed_books: List[str] = [loan.book.title for loan in member.loans if loan.book and not loan.returned]
                 self._log('debug', 'MEMBER_FORMAT_DETAIL',
                           msg=f'Member {member.member_id} has {len(borrowed_books)} active borrowed book(s).',
                           name=member.name, member_id=member.member_id, borrowed_count=len(borrowed_books))
@@ -142,12 +145,12 @@ class MemberService:
                       error=str(e))
             raise
 
-    def show_members(self, raw=False):
+    def show_members(self, raw: bool=False) -> Union[List[Member], List[dict]]:
         try:
             self._log('info', 'MEMBER_FETCH_START',
                       msg='Retrieving all members from database.')
 
-            members = self.member_repo.get_members_with_loans_and_books().all()
+            members: List[Member] = self.member_repo.get_members_with_loans_and_books().all()
 
             if not members:
                 self._log('info', 'MEMBER_FETCH_EMPTY',
@@ -166,13 +169,13 @@ class MemberService:
                       error=str(e))
             raise
 
-    def search_members(self, keyword, raw=False):
+    def search_members(self, keyword: Optional[str], raw: bool=False) -> Union[List[Member], List[dict]]:
         try:
             self._log('info', 'MEMBER_SEARCH_START',
                       msg=f'Searching members with keyword "{keyword}".',
                       keyword=keyword)
 
-            results = self.member_repo.search_members_with_loans_and_books(keyword).all()
+            results: List[Member] = self.member_repo.search_members_with_loans_and_books(keyword).all()
 
             if not results:
                 self._log('info', 'MEMBER_SEARCH_EMPTY',

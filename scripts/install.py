@@ -2,36 +2,37 @@ import psycopg2
 from dotenv import load_dotenv
 import os
 from app.db.init_db import init_db
-
-def main():
+from psycopg2.extensions import connection as PsycopgConnection, cursor as PsycopgCursor
+from typing import Optional, Tuple
+def main() -> None:
 
     load_dotenv()
 
 
 
-    db_name = os.getenv('DB_NAME')
-    db_user = os.getenv('DB_USER')
-    db_password = os.getenv('DB_PASSWORD')
-    db_host = os.getenv('DB_HOST', 'localhost')
+    db_name: str = os.getenv('DB_NAME')
+    db_user: str = os.getenv('DB_USER')
+    db_password: str = os.getenv('DB_PASSWORD')
+    db_host: str = os.getenv('DB_HOST', 'localhost')
 
 
 
     if not all([db_name, db_user, db_password]):
         print('Missing database config. Please enter manually:')
-        db_name = input('DB Name: ')
-        db_user = input('DB User: ')
-        db_password = input('DB Password: ')
+        db_name: str = input('DB Name: ')
+        db_user: str = input('DB User: ')
+        db_password: str = input('DB Password: ')
 
 
 
-    def create_database():
-        connection = psycopg2.connect(dbname='postgres', user=db_user, password=db_password, host=db_host)
+    def create_database() -> None:
+        connection: PsycopgConnection = psycopg2.connect(dbname='postgres', user=db_user, password=db_password, host=db_host)
         connection.autocommit = True
-        cursor = connection.cursor()
+        cursor: PsycopgCursor = connection.cursor()
 
 
         cursor.execute("SELECT 1 FROM pg_database WHERE datname=%s", (db_name,))
-        exists = cursor.fetchone()
+        exists: Optional[Tuple] = cursor.fetchone()
 
 
 

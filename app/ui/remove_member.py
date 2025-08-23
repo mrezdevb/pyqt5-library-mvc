@@ -9,10 +9,11 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-
+from PyQt5.QtWidgets import QMainWindow, QApplication
+from typing import Callable
 
 class Ui_RemoveMember(object):
-    def setupUi(self, MainWindow):
+    def setupUi(self, MainWindow: QMainWindow):
         MainWindow.setFixedSize(800, 600)
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(800, 600)
@@ -78,8 +79,8 @@ class Ui_RemoveMember(object):
 
 
 
-    def retranslateUi(self, MainWindow):
-        _translate = QtCore.QCoreApplication.translate
+    def retranslateUi(self, MainWindow: QMainWindow):
+        _translate: Callable[[str, str], str] = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.btn_remove_member.setText(_translate("MainWindow", "Remove Member"))
         self.label_member_id.setText(_translate("MainWindow", "Member ID"))
@@ -90,9 +91,9 @@ class Ui_RemoveMember(object):
 
 if __name__ == "__main__":
     import sys
-    app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QMainWindow()
-    ui = Ui_RemoveMember()
+    app: QApplication = QtWidgets.QApplication(sys.argv)
+    MainWindow: QMainWindow = QtWidgets.QMainWindow()
+    ui: Ui_RemoveMember = Ui_RemoveMember()
     ui.setupUi(MainWindow)
     MainWindow.show()
     sys.exit(app.exec_())

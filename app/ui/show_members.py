@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtWidgets import QMainWindow, QApplication
+from typing import Callable
+
 
 class Ui_ShowMembers(object):
-    def setupUi(self, MainWindow):
+    def setupUi(self, MainWindow: QMainWindow):
         MainWindow.setFixedSize(800, 600)
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(800, 600)
@@ -86,8 +89,8 @@ class Ui_ShowMembers(object):
 
 
 
-    def retranslateUi(self, MainWindow):
-        _translate = QtCore.QCoreApplication.translate
+    def retranslateUi(self, MainWindow: QMainWindow):
+        _translate: Callable[[str, str], str] = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "Show Members"))
         item = self.table_members.verticalHeaderItem(0)
         item.setText(_translate("MainWindow", "1"))
@@ -102,9 +105,9 @@ class Ui_ShowMembers(object):
 
 if __name__ == "__main__":
     import sys
-    app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QMainWindow()
-    ui = Ui_ShowMembers()
+    app: QApplication = QtWidgets.QApplication(sys.argv)
+    MainWindow: QMainWindow = QtWidgets.QMainWindow()
+    ui: Ui_ShowMembers = Ui_ShowMembers()
     ui.setupUi(MainWindow)
     MainWindow.show()
     sys.exit(app.exec_())

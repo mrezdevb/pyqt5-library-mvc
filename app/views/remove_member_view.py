@@ -5,17 +5,17 @@ from app.controllers.library_controller import LibraryController
 
 class RemoveMemberView(QMainWindow):
 
-    def __init__(self, controller):
+    def __init__(self, controller: LibraryController) -> None:
         super().__init__()
-        self.ui = Ui_RemoveMember()
+        self.ui: Ui_RemoveMember = Ui_RemoveMember()
         self.ui.setupUi(self)
-        self.controller = controller
+        self.controller: LibraryController = controller
         self.ui.btn_remove_member.clicked.connect(self.remove_member)
         
 
 
-    def remove_member(self):
-        member_id = self.ui.line_member_id.text().strip()
+    def remove_member(self) -> None:
+        member_id: str = self.ui.line_member_id.text().strip()
         
 
         if not member_id:
@@ -23,7 +23,7 @@ class RemoveMemberView(QMainWindow):
             return
         
 
-        reply = QMessageBox.question(
+        reply: QMessageBox.StandardButton = QMessageBox.question(
             self,
             'Confirm Delete',
             f'Are you sure you want to remove member "{member_id}" ?',
@@ -33,7 +33,8 @@ class RemoveMemberView(QMainWindow):
 
         if reply != QMessageBox.Yes:
             return
-        
+        success: bool
+        msg: str
 
         success, msg = self.controller.remove_member(member_id)
 

@@ -4,19 +4,19 @@ from app.controllers.library_controller import LibraryController
 
 class RemoveBookView(QMainWindow):
 
-	def __init__(self, controller):
+	def __init__(self, controller: LibraryController) -> None:
 		super().__init__()
-		self.ui = Ui_RemoveBook()
+		self.ui: Ui_RemoveBook = Ui_RemoveBook()
 		self.ui.setupUi(self)
-		self.controller = controller
+		self.controller: LibraryController = controller
 		self.ui.btn_remove_book.clicked.connect(self.remove_book)
 
 
 
 
 
-	def remove_book(self):
-		isbn = self.ui.line_isbn.text().strip()
+	def remove_book(self) -> None:
+		isbn: str = self.ui.line_isbn.text().strip()
 
 
 		if not isbn:
@@ -24,7 +24,7 @@ class RemoveBookView(QMainWindow):
 			return
 		
 
-		reply = QMessageBox.question(
+		reply: QMessageBox.StandardButton = QMessageBox.question(
 			self,
 			'Confirm Delete',
 			f'Are you sure you want to remove this book "{isbn}"?',
@@ -35,7 +35,8 @@ class RemoveBookView(QMainWindow):
 		if reply != QMessageBox.Yes:
 			return
 		
-
+		success: bool
+		msg: str
 		success, msg = self.controller.remove_book(isbn)
 
 

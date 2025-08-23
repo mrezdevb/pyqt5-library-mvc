@@ -1,32 +1,32 @@
 from contextvars import ContextVar
+from typing import Optional
+
+trace_id_var: ContextVar[Optional[str]] = ContextVar('trace_id', default=None)
+user_id_var: ContextVar[Optional[str]] = ContextVar('user_id', default=None)
+extra_data_var: ContextVar[dict] = ContextVar('extra_data', default={})
 
 
-trace_id_var = ContextVar('trace_id', default=None)
-user_id_var = ContextVar('user_id', default=None)
-extra_data_var = ContextVar('extra_data', default={})
-
-
-def set_trace_id(trace_id: str):
+def set_trace_id(trace_id: str) -> None:
 	trace_id_var.set(trace_id)
 
 
 
-def get_trace_id() -> str:
+def get_trace_id() -> Optional[str]:
 	return trace_id_var.get()
 
 
 
-def set_user_id(user_id):
+def set_user_id(user_id) -> None:
 	user_id_var.set(user_id)
 
 
 
-def get_user_id():
+def get_user_id() -> Optional[str]:
 	return user_id_var.get()
 
 
 
-def set_extra_data(data: dict):
+def set_extra_data(data: dict) -> None:
 	current = extra_data_var.get() or {}
 	current.update(data)
 	extra_data_var.set(current)
@@ -38,7 +38,7 @@ def get_extra_data() -> dict:
 
 
 
-def clear_context():
+def clear_context() -> None:
 	trace_id_var.set(None)
 	user_id_var.set(None)
 	extra_data_var.set({})

@@ -9,10 +9,10 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-
-
+from PyQt5.QtWidgets import QMainWindow, QApplication
+from typing import Callable
 class Ui_AddMember(object):
-    def setupUi(self, MainWindow):
+    def setupUi(self, MainWindow: QMainWindow):
         MainWindow.setFixedSize(800, 600)
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(800, 600)
@@ -84,8 +84,8 @@ class Ui_AddMember(object):
 
 
 
-    def retranslateUi(self, MainWindow):
-        _translate = QtCore.QCoreApplication.translate
+    def retranslateUi(self, MainWindow: QMainWindow):
+        _translate: Callable[[str, str], str] = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "Add Member"))
         self.btn_add_member.setText(_translate("MainWindow", "Add Member"))
         self.label_name.setText(_translate("MainWindow", "          Name"))
@@ -96,9 +96,9 @@ class Ui_AddMember(object):
 
 if __name__ == "__main__":
     import sys
-    app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QMainWindow()
-    ui = Ui_AddMember()
+    app: QApplication = QtWidgets.QApplication(sys.argv)
+    MainWindow: QMainWindow = QtWidgets.QMainWindow()
+    ui: Ui_AddMember = Ui_AddMember()
     ui.setupUi(MainWindow)
     MainWindow.show()
     sys.exit(app.exec_())
