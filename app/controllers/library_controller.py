@@ -1,150 +1,126 @@
-from app.services.book_service import BookService
-from app.services.member_service import MemberService
-from app.services.loan_service import LoanService
-from app.db.unit_of_work import UnitOfWork
+from typing import ClassVar, Optional, Tuple, Any
+
 from PyQt5.QtCore import QObject, pyqtSignal
-from app.observability.log_context import set_trace_id, set_user_id, set_extra_data, clear_context, get_trace_id
-from app.observability.logger import get_logger
-from app.observability.trace_decorators import traced
-import uuid
-from typing import ClassVar, Optional, Tuple
+
+from app.db.unit_of_work import UnitOfWork
 from app.models.book import Book
 from app.models.member import Member
+from app.observability.log_context import get_trace_id
+from app.observability.logger import get_logger
+from app.observability.trace_decorators import traced
+from app.services.book_service import BookService
+from app.services.loan_service import LoanService
+from app.services.member_service import MemberService
 
 log = get_logger("LibraryController")
 
 
 class LibraryController(QObject):
 
-	books_updated: ClassVar[pyqtSignal] = pyqtSignal()
-	members_updated: ClassVar[pyqtSignal] = pyqtSignal()
+    books_updated: ClassVar[pyqtSignal] = pyqtSignal()
+    members_updated: ClassVar[pyqtSignal] = pyqtSignal()
 
+    def __init__(self, uow: Optional[UnitOfWork] = None) -> None:
 
-	def __init__(self, uow: Optional[UnitOfWork]=None) -> None:
+        super().__init__()
+        self.uow: UnitOfWork = uow or UnitOfWork()
+        self.book_service: BookService = BookService(self.uow)
+        self.member_service: MemberService = MemberService(self.uow)
+        self.loan_service: LoanService = LoanService(self.uow)
 
-		super().__init__()
-		self.uow: UnitOfWork = uow or UnitOfWork()
-		self.book_service: BookService = BookService(self.uow)
-		self.member_service: MemberService = MemberService(self.uow)
-		self.loan_service: LoanService = LoanService(self.uow)
+    def _commit_ok(self, ok: bool) -> bool:
 
+        action: str = "TX_COMMIT" if ok else "TX_ROLLBACK"
 
+        log.info({"action": action, "trace_id": get_trace_id()})
 
+        if ok:
+            self.uow.commit()
 
+        else:
+            self.uow.rollback()
 
-	def _commit_ok(self, ok: bool) -> bool:
+        return ok
 
-		action: str = 'TX_COMMIT' if ok else 'TX_ROLLBACK'
+    @traced("ADD_BOOK")
+    def add_book(self, title: str, author: str, isbn: str) -> Tuple[bool, str]:
+        ok, msg = self.book_service.add_book(title, author, isbn)
 
-		log.info({
-			'action': action,
-			'trace_id': get_trace_id()
-		})
+        if self._commit_ok(ok):
+            self.books_updated.emit()
 
-		if ok:
-			self.uow.commit()
+        return ok, msg
 
-		else:
-			self.uow.rollback()
+    @traced("REMOVE_BOOK")
+    def remove_book(self, isbn: str) -> Tuple[bool, str]:
+        ok, msg = self.book_service.remove_book(isbn)
 
-		return ok
-	
+        if self._commit_ok(ok):
+            self.books_updated.emit()
+            self.members_updated.emit()
 
+        return ok, msg
 
-	@traced('ADD_BOOK')
-	def add_book(self, title: str, author: str, isbn: str) -> Tuple[bool, str]:
-		ok, msg = self.book_service.add_book(title, author, isbn)
+    @traced("ADD_MEMBER")
+    def add_member(self, name: str, member_id: str) -> Tuple[bool, str]:
+        ok, msg = self.member_service.add_member(name, member_id)
 
-		if self._commit_ok(ok):
-			self.books_updated.emit()
+        if self._commit_ok(ok):
+            self.members_updated.emit()
 
-		return ok, msg
-	
+        return ok, msg
 
-	@traced('REMOVE_BOOK')
-	def remove_book(self, isbn: str) -> Tuple[bool, str]:
-		ok, msg = self.book_service.remove_book(isbn)
+    @traced("REMOVE_MEMBER")
+    def remove_member(self, member_id: str) -> Tuple[bool, str]:
+        ok, msg = self.member_service.remove_member(member_id)
 
-		if self._commit_ok(ok):
-			self.books_updated.emit()
-			self.members_updated.emit()
+        if self._commit_ok(ok):
+            self.members_updated.emit()
+            self.books_updated.emit()
 
-		return ok, msg
-	
+        return ok, msg
 
+    @traced("LOAN_BOOK")
+    def loan_book(self, member_id: str, isbn: str) -> Tuple[bool, str]:
+        ok, msg = self.loan_service.loan_book(member_id, isbn)
 
-	@traced('ADD_MEMBER')
-	def add_member(self, name: str, member_id: str) -> Tuple[bool, str]:
-		ok, msg = self.member_service.add_member(name, member_id)
+        if self._commit_ok(ok):
+            self.books_updated.emit()
+            self.members_updated.emit()
 
-		if self._commit_ok(ok):
-			self.members_updated.emit()
+        return ok, msg
 
-		return ok, msg
-	
+    @traced("RETURN_BOOK")
+    def return_book(self, member_id: str, isbn: str) -> Tuple[bool, str]:
+        ok, msg = self.loan_service.return_book(member_id, isbn)
 
-	@traced('REMOVE_MEMBER')
-	def remove_member(self, member_id: str) -> Tuple[bool, str]:
-		ok, msg = self.member_service.remove_member(member_id)
+        if self._commit_ok(ok):
+            self.books_updated.emit()
+            self.members_updated.emit()
 
-		if self._commit_ok(ok):
-			self.members_updated.emit()
-			self.books_updated.emit()
+        return ok, msg
 
-		return ok, msg
-	
+    @traced("SHOW_BOOKS")
+    def show_books(self, filter_option: Optional[str] = None) -> list[Book]:
 
-	@traced('LOAN_BOOK')
-	def loan_book(self, member_id: str, isbn: str) -> Tuple[bool, str]:
-		ok, msg =  self.loan_service.loan_book(member_id, isbn)
+        return self.book_service.show_books(filter_option)
 
-		if self._commit_ok(ok):
-			self.books_updated.emit()
-			self.members_updated.emit()
+    @traced("SEARCH_BOOKS")
+    def search_books(self, keyword: str, filter_option: str) -> Tuple[list[Book], str]:
 
-		return ok, msg
-	
+        return self.book_service.search_books(keyword, filter_option)
 
+    @traced("SHOW_MEMBERS")
+    def show_members(self, raw: bool = False) -> list[Member] | list[dict[Any, Any]]:
 
-	@traced('RETURN_BOOK')
-	def return_book(self, member_id: str, isbn: str) -> Tuple[bool, str]:
-		ok, msg = self.loan_service.return_book(member_id, isbn)
+        return self.member_service.show_members(raw)
 
-		if self._commit_ok(ok):
-			self.books_updated.emit()
-			self.members_updated.emit()
+    @traced("SEARCH_MEMBERS")
+    def search_members(
+        self, keyword: str, raw: bool = False
+    ) -> list[Member] | list[dict[Any, Any]]:
 
-		return ok, msg
-	
+        return self.member_service.search_members(keyword, raw)
 
-
-	@traced('SHOW_BOOKS')
-	def show_books(self, filter_option: Optional[str]=None) -> list[Book]:
-
-		return self.book_service.show_books(filter_option)
-	
-
-
-	@traced('SEARCH_BOOKS')
-	def search_books(self, keyword: str, filter_option: str) -> list[Book]:
-
-		return self.book_service.search_books(keyword, filter_option)
-	
-
-
-	@traced('SHOW_MEMBERS')
-	def show_members(self, raw: bool=False) -> list[Member]:
-
-		return self.member_service.show_members(raw)
-	
-
-
-	@traced('SEARCH_MEMBERS')
-	def search_members(self, keyword: str, raw: bool=False) -> list[Member]:
-
-		return self.member_service.search_members(keyword, raw)
-	
-
-	
-	def close(self) -> None:
-		self.uow.close()
+    def close(self) -> None:
+        self.uow.close()

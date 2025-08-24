@@ -1,20 +1,18 @@
 # -*- coding: utf-8 -*-
 
-from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.QtWidgets import QMainWindow, QApplication
 from typing import Callable
+
+from PyQt5 import QtCore, QtWidgets
+from PyQt5.QtWidgets import QApplication, QMainWindow
 
 
 class Ui_ShowMembers(object):
-    def setupUi(self, MainWindow: QMainWindow):
+    def setupUi(self, MainWindow: QMainWindow) -> None:
         MainWindow.setFixedSize(800, 600)
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(800, 600)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
-
-       
-
 
         self.verticalLayoutWidget = QtWidgets.QWidget(self.centralwidget)
         self.verticalLayoutWidget.setGeometry(QtCore.QRect(70, 40, 671, 400))
@@ -23,9 +21,6 @@ class Ui_ShowMembers(object):
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
         self.verticalLayout.setSpacing(10)
         self.verticalLayout.setObjectName("verticalLayout")
-
-   
-
 
         self.search_layout = QtWidgets.QHBoxLayout()
         self.search_layout.setSpacing(10)
@@ -38,12 +33,9 @@ class Ui_ShowMembers(object):
         self.search_layout.addWidget(self.search_btn)
         self.verticalLayout.addLayout(self.search_layout)
 
-      
-
-
         self.table_members = QtWidgets.QTableWidget(self.verticalLayoutWidget)
         self.table_members.setObjectName("table_members")
-        self.table_members.setColumnCount(3) 
+        self.table_members.setColumnCount(3)
         self.table_members.setRowCount(1)
         item = QtWidgets.QTableWidgetItem()
         self.table_members.setVerticalHeaderItem(0, item)
@@ -52,17 +44,22 @@ class Ui_ShowMembers(object):
         item = QtWidgets.QTableWidgetItem()
         self.table_members.setHorizontalHeaderItem(1, item)
         item = QtWidgets.QTableWidgetItem()
-        self.table_members.setHorizontalHeaderItem(2, item)  
-        self.table_members.horizontalHeader().setDefaultSectionSize(190)
-        self.table_members.horizontalHeader().setHighlightSections(True)
-        self.table_members.horizontalHeader().setMinimumSectionSize(23)
-        self.table_members.horizontalHeader().setSortIndicatorShown(False)
-        self.table_members.horizontalHeader().setStretchLastSection(True)
-        self.table_members.verticalHeader().setVisible(True)
+
+        self.table_members.setHorizontalHeaderItem(2, item)
+
+        h_header = self.table_members.horizontalHeader()
+        if h_header is not None:
+            h_header.setDefaultSectionSize(190)
+            h_header.setHighlightSections(True)
+            h_header.setMinimumSectionSize(23)
+            h_header.setSortIndicatorShown(False)
+            h_header.setStretchLastSection(True)
+
+        v_header = self.table_members.verticalHeader()
+        if v_header is not None:
+            v_header.setVisible(True)
+
         self.verticalLayout.addWidget(self.table_members)
-
-      
-
 
         self.verticalLayoutWidget_4 = QtWidgets.QWidget(self.centralwidget)
         self.verticalLayoutWidget_4.setGeometry(QtCore.QRect(0, 490, 101, 61))
@@ -70,8 +67,6 @@ class Ui_ShowMembers(object):
         self.verticalLayout_4 = QtWidgets.QVBoxLayout(self.verticalLayoutWidget_4)
         self.verticalLayout_4.setContentsMargins(0, 0, 0, 0)
         self.verticalLayout_4.setObjectName("verticalLayout_4")
-
-
 
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
@@ -82,29 +77,33 @@ class Ui_ShowMembers(object):
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
 
-
-
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
-
-
-    def retranslateUi(self, MainWindow: QMainWindow):
+    def retranslateUi(self, MainWindow: QMainWindow) -> None:
         _translate: Callable[[str, str], str] = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "Show Members"))
-        item = self.table_members.verticalHeaderItem(0)
-        item.setText(_translate("MainWindow", "1"))
-        item = self.table_members.horizontalHeaderItem(0)
-        item.setText(_translate("MainWindow", "Name"))
-        item = self.table_members.horizontalHeaderItem(1)
-        item.setText(_translate("MainWindow", "Member ID"))
-        item = self.table_members.horizontalHeaderItem(2)
-        item.setText(_translate("MainWindow", "Borrowed Books")) 
 
+        v_item = self.table_members.verticalHeaderItem(0)
+        if v_item is not None:
+            v_item.setText(_translate("MainWindow", "1"))
+
+        h_item = self.table_members.horizontalHeaderItem(0)
+        if h_item is not None:
+            h_item.setText(_translate("MainWindow", "Name"))
+
+        h_item = self.table_members.horizontalHeaderItem(1)
+        if h_item is not None:
+            h_item.setText(_translate("MainWindow", "Member ID"))
+
+        h_item = self.table_members.horizontalHeaderItem(2)
+        if h_item is not None:
+            h_item.setText(_translate("MainWindow", "Borrowed Books"))
 
 
 if __name__ == "__main__":
     import sys
+
     app: QApplication = QtWidgets.QApplication(sys.argv)
     MainWindow: QMainWindow = QtWidgets.QMainWindow()
     ui: Ui_ShowMembers = Ui_ShowMembers()

@@ -1,12 +1,14 @@
-from app.models.member import Member
-from app.models.loan import Loan
-from app.db.db import SessionLocal
 from sqlalchemy import or_
-from sqlalchemy.orm import joinedload, Query
+from sqlalchemy.orm import Query, joinedload
+from typing import Optional
+from app.models.loan import Loan
+from app.models.member import Member
+from typing import Any
+
 
 class MemberRepository:
-    def __init__(self, db: SessionLocal):
-        self.db: SessionLocal = db
+    def __init__(self, db: Any):
+        self.db = db
 
     def query_all(self) -> Query[Member]:
         return self.db.query(Member)
@@ -17,8 +19,8 @@ class MemberRepository:
     def query_by_keyword(self, keyword: str) -> Query[Member]:
         return self.db.query(Member).filter(
             or_(
-                Member.name.ilike(f'%{keyword}%'),
-                Member.member_id.ilike(f'%{keyword}%'),
+                Member.name.ilike(f"%{keyword}%"),
+                Member.member_id.ilike(f"%{keyword}%"),
             )
         )
 
@@ -35,12 +37,16 @@ class MemberRepository:
             joinedload(Member.loans).joinedload(Loan.book)
         )
 
-    def search_members_with_loans_and_books(self, keyword: str) -> Query[Member]:
-        return self.db.query(Member).options(
-            joinedload(Member.loans).joinedload(Loan.book)
-        ).filter(
-            or_(
-                Member.name.ilike(f'%{keyword}%'),
-                Member.member_id.ilike(f'%{keyword}%')
+    def search_members_with_loans_and_books(
+        self, keyword: Optional[str]
+    ) -> Query[Member]:
+        return (
+            self.db.query(Member)
+            .options(joinedload(Member.loans).joinedload(Loan.book))
+            .filter(
+                or_(
+                    Member.name.ilike(f"%{keyword}%"),
+                    Member.member_id.ilike(f"%{keyword}%"),
+                )
             )
         )
