@@ -17,7 +17,7 @@ with open("requirements.txt") as f:
 
 setup(
     name="library_manager",
-    version="2.8.0",
+    version="2.9.0",
     packages=find_packages(),
     install_requires=requirements,
     include_package_data=True,
@@ -27,6 +27,7 @@ setup(
             "library-run = app.main:main",
             "library-install = scripts.install:main",
             "library-uninstall=scripts.uninstall:drop_database",
+            "make-lint=scripts.lint_and_type_check:main",
         ],
     },
     cmdclass={

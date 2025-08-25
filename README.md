@@ -1,69 +1,41 @@
-# 📚 Library Manager --- Release v2.8.0
+# 📚 Library Manager --- Release v2.9.0
 
 ## 🚀 What's New in This Release
 
-### 🆕 Static Analysis & Code Quality
+### 🆕 Unified Linting Script
+-   Added **`make-lint`** command to run all static analysis tools at once:
+    -   **flake8** → style & linting
+    -   **black** → auto-formatting
+    -   **mypy** → static type checking
+-   No need to run tools separately — one command handles all.
 
--   Added **flake8** for linting and style guide enforcement.
--   Added **black** for auto-formatting (PEP 8 compliant).
--   Added **mypy** for static type checking.
+### 🔧 Minor Function Improvements
+-   Small refactoring and performance improvements in service and repository methods.
+-   More consistent return types thanks to type hints.
+
+### 🆕 Static Analysis & Code Quality (since v2.8.0)
+-   Integrated **flake8**, **black**, **mypy** across the project.
 -   Ensures clean, consistent, and type-safe codebase.
 
 ### 🆕 Type Hints Everywhere (since v2.7.0)
-
 -   Full adoption of **PEP 484** type hints across controllers,
     services, repositories, and models.
 -   Improved IDE autocompletion and developer experience.
 
 ### ⚙️ Config Manager (since v2.6.0)
-
 -   Centralized settings with **pydantic-settings**.  
 -   Runtime validation + computed `db_url`.
 -   Drop-in replacement for `os.getenv`.
 
 ### 🔄 Unit of Work (since v2.5.0)
-
 -   Transaction boundary for all repositories.
 -   Guarantees atomic operations per request/command.
 
 ------------------------------------------------------------------------
 
-## 🏗 Project Structure (unchanged)
-
-``` text
-app/
-├── config/               # Settings (pydantic-settings)
-├── controllers/          # Handles user interaction
-├── db/                   # Engine, SessionLocal, Unit of Work
-├── models/               # ORM models
-├── observability/        # Logging & tracing
-├── repositories/         # Data access
-├── services/             # Business logic
-├── ui/                   # Application UI
-└── views/                # PyQt views
-```
-
-------------------------------------------------------------------------
-
-## 🛠 Example with Type Hints
-
-``` python
-# app/services/book_service.py
-from app.db.unit_of_work import UnitOfWork
-from app.models.book import Book
-from app.repositories.book_repository import BookRepository
-
-class BookService:
-    def __init__(self, uow: UnitOfWork) -> None:
-        self.uow: UnitOfWork = uow
-        self.book_repo: BookRepository = uow.book_repo
-```
-
-------------------------------------------------------------------------
-
 ## 📦 Installation & Usage
 
-``` bash
+```bash
 pip install .
 setup-env
 library-install
@@ -75,32 +47,26 @@ library-uninstall
 
 ## ✅ Static Analysis & Formatting
 
-### 🔍 Linting with flake8
-``` bash
+### 🚀 Run All (recommended)
+```bash
+make lint
+```
+
+### 🔍 Individual Tools
+```bash
 flake8 .
-```
-
-### 🎨 Formatting with black
-``` bash
 black .
-```
-
-### 🧩 Type Checking with mypy
-``` bash
 mypy app/ scripts/
 ```
 
 ------------------------------------------------------------------------
 
 ## ⚠️ Migration Notes
-
--   Add **mypy**, **flake8**, and **black** to your toolchain.  
--   Ensure all code passes static checks before commits.  
--   Type hints are now mandatory for new contributions.  
--   No changes required for Config Manager or Unit of Work.  
+-   Use `make lint` for unified static analysis instead of separate commands.  
+-   Ensure all code passes checks before commits.  
+-   Type hints remain **mandatory** for new contributions.  
 
 ------------------------------------------------------------------------
 
 ## 🏷 Version Tag
-
-**Tag:** `v2.8.0`
+**Tag:** `v2.9.0`

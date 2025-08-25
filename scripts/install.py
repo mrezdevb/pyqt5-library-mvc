@@ -1,22 +1,20 @@
-import os
 from typing import Optional, Tuple
 
 import psycopg2
-from dotenv import load_dotenv
+
 from psycopg2.extensions import connection as PsycopgConnection
 from psycopg2.extensions import cursor as PsycopgCursor
 
 from app.db.init_db import init_db
+from app.config.settings import settings
 
 
 def main() -> None:
 
-    load_dotenv()
-
-    db_name: Optional[str] = os.getenv("DB_NAME")
-    db_user: Optional[str] = os.getenv("DB_USER")
-    db_password: Optional[str] = os.getenv("DB_PASSWORD")
-    db_host: Optional[str] = os.getenv("DB_HOST", "localhost")
+    db_name: Optional[str] = settings.db_name
+    db_user: Optional[str] = settings.db_user
+    db_password: Optional[str] = settings.db_password
+    db_host: Optional[str] = settings.db_host
 
     if not all([db_name, db_user, db_password]):
         print("Missing database config. Please enter manually:")
